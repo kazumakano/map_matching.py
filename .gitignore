@@ -1,0 +1,5 @@
+# for macOS
+.DS_Store
+map/.DS_Store
+script/.DS_Store
+script/config/.DS_Store
