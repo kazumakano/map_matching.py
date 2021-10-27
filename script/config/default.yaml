@@ -1,0 +1,44 @@
+# particle
+match_weight_policy: 2
+min_vanilla_lh: 0.005
+
+# search links
+max_link_len: 80
+
+# map matching
+enable_draw_nodes: False
+enable_draw_links: False
+nodes_show_policy: 2
+set_links_policy: 1
+
+# particle filter
+begin: "2021-10-08 14:56:00"
+end: "2021-10-08 15:17:00"
+enable_truth: False
+
+map_img_file: ptokai3.pgm
+map_conf_file: ptokai3.yaml
+enable_draw_beacons: False
+map_show_policy: 3
+
+enable_save_video: False
+enable_save_img: False
+file_name:
+frame_rate: 1
+
+win_stride: 1
+win_size: 4
+win_policy: 1
+
+particle_num: 256
+init_pos: [1300, 900]
+init_pos_sd: 16
+init_direct: 270
+init_direct_sd: 45
+direct_sd: 4.5
+max_particle_stride: 32
+lost_resample_policy: 1
+
+propag_coef: 4
+el_correction: 2
+dist_sd: 64
