@@ -19,6 +19,7 @@ enable_truth: False
 map_img_file: ptokai3.pgm
 map_conf_file: ptokai3.yaml
 enable_draw_beacons: False
+enable_clear_map: True
 map_show_policy: 3
 
 enable_save_video: False

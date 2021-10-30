@@ -26,7 +26,7 @@ def set_params(conf_file: Union[str, None] = None) -> dict:
     ROOT_DIR = path.dirname(__file__) + "/../"              # project root directory
 
     if conf_file is None:
-        conf_file = ROOT_DIR + "script/config/default.yaml"    # load default file if not specified
+        conf_file = ROOT_DIR + "config/default.yaml"    # load default file if not specified
     else:
         conf_file = conf_file
 
