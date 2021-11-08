@@ -29,8 +29,6 @@ class Map(PfMap):
 
         self._set_links()
 
-        self.export_links()
-
     def _init_links(self) -> None:
         self.link_nodes = np.empty((len(self.node_poses)), dtype=np.ndarray)
         self.link_costs = np.empty((len(self.node_poses)), dtype=np.ndarray)
@@ -59,6 +57,8 @@ class Map(PfMap):
 
                 if j not in self.link_nodes[i] and cost < param.MAX_LINK_LEN:    # not to deplicate
                     self._set_nodes_and_costs(i, j, cost)
+
+        print(f"map.py: {link_file} has been loaded")
 
     def _get_direct_links_from_img(self) -> None:
         for c in combinations_with_replacement(enumerate(self.node_poses), 2):    # c is ((i, node_poses[i]), (j, node_poses[j]))
@@ -112,6 +112,8 @@ class Map(PfMap):
             for i in range(len(self.node_poses)):
                 for index_ij, j in enumerate(self.link_nodes[i]):
                     writer.writerow((self.node_names[i], self.node_names[j], self.link_costs[i][index_ij]))
+
+        print(f"map.py: links have been exported to link.csv")
 
     def get_nearest_node(self, pos: np.ndarray) -> int:
         min_dist = np.inf
