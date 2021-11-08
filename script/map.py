@@ -125,6 +125,9 @@ class Map(PfMap):
         return min_index
 
     def draw_nodes(self, is_never_cleared: bool = False) -> None:
+        if not param.ENABLE_DRAW_NODES:
+            raise Warning("map.py: drawing nodes is not enabled but draw_nodes was called")
+
         for i, p in enumerate(self.node_poses):
             if param.NODES_SHOW_POLICY == 1:
                 if is_never_cleared:
