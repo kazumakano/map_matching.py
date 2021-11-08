@@ -27,6 +27,8 @@ def vis_map() -> None:
         map.draw_nodes()
     if param.ENABLE_DRAW_LINKS:
         map.draw_links()
+    if pf_param.ENABLE_SAVE_IMG:
+        map.save_img()
 
     map.show(0)
 
@@ -36,14 +38,16 @@ if __name__ == "__main__":
     parser.add_argument("-b", "--beacon", action="store_true", help="enable draw beacons")
     parser.add_argument("-n", "--node", action="store_true", help="enable draw nodes")
     parser.add_argument("-l", "--link", action="store_true", help="enable draw links")
+    parser.add_argument("-s", "--save", action="store_true", help="enable save image")
     args = parser.parse_args()
 
-    if (not args.beacon) and(not args.node) and (not args.link):
+    if (not args.beacon) and (not args.node) and (not args.link):
         raise Warning("visualize_nodes_and_links.py: set flags in order to visualize")
 
     set_params(args.config)
     pf_param.ENABLE_DRAW_BEACONS = args.beacon
     param.ENABLE_DRAW_NODES = args.node
     param.ENABLE_DRAW_LINKS = args.link
+    pf_param.ENABLE_SAVE_IMG = args.save
 
     vis_map()
