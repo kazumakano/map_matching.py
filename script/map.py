@@ -1,6 +1,5 @@
 import csv
 from itertools import combinations_with_replacement
-from typing import Union
 import cv2
 import numpy as np
 import particle_filter.script.parameter as pf_param
@@ -10,7 +9,6 @@ from line_iterator.script.line_iterator import LineIterator
 from particle_filter.script.log import Log
 from particle_filter.script.map import Map as PfMap
 from . import parameter as param
-from . import utility as util
 
 
 class Map(PfMap):
@@ -77,20 +75,20 @@ class Map(PfMap):
         if j not in self.link_nodes[i]:
             self._set_nodes_and_costs(i, j, cost)    # set nodes and costs if new
         else:
-            index_ij = np.where(j == self.link_nodes[i])[0][0]
+            index_ij: np.int64 = np.where(j == self.link_nodes[i])[0][0]
             if cost < self.link_costs[i][index_ij]:
                 self.link_costs[i][index_ij] = cost    # update costs if lower
                 self.link_costs[j][np.where(i == self.link_nodes[j])[0][0]] = cost
 
     def _search_links_recursively(self, node_indexes: np.ndarray, cost: np.float16) -> None:
-        i = node_indexes[0]
-        j = node_indexes[-1]
+        i: np.uint16 = node_indexes[0]
+        j: np.uint16 = node_indexes[-1]
 
         for index_jk, k in enumerate(self.link_nodes[j]):
             if k in node_indexes:
                 continue
 
-            cost_sum = cost + self.link_costs[j][index_jk]
+            cost_sum: np.float16 = cost + self.link_costs[j][index_jk]
             if cost_sum < param.MAX_LINK_LEN:
                 self._update_nodes_and_costs(i, k, cost_sum)
                 self._search_links_recursively(np.hstack((node_indexes, k)), cost_sum)
@@ -98,18 +96,6 @@ class Map(PfMap):
     def _search_indirect_links(self) -> None:
         for i in range(len(self.node_poses)):
             self._search_links_recursively(np.array((i,), dtype=np.uint16), 0)
-
-    def _search_indirect_links_2(self) -> None:
-        for i in range(len(self.node_poses)):
-            for index_ij, j in enumerate(self.link_nodes[i]):
-                if j == i:
-                    continue
-                for index_jk, k in enumerate(self.link_nodes[j]):
-                    if k == j or k == i:
-                        continue
-                    dist_sum: np.float16 = self.link_costs[i][index_ij] + self.link_costs[j][index_jk]
-                    if (dist_sum < param.MAX_LINK_LEN) and (k not in self.link_nodes[i]):
-                        self._set_nodes_and_costs(i, k, dist_sum)
 
     def _set_links(self) -> None:
         self._init_links()
@@ -146,7 +132,7 @@ class Map(PfMap):
                 cv2.putText(self.img, self.node_names[i], p, cv2.FONT_HERSHEY_PLAIN, 1, (128, 128, 128), 2, cv2.LINE_AA)
 
     def _draw_link(self, i: int, j: int) -> None:
-        cv2.line(self.img, self.node_poses[i], self.node_poses[j], (0, 128, 0), 2)
+        cv2.line(self.img, self.node_poses[i], self.node_poses[j], (128, 128, 128), 2)
 
     def draw_links(self) -> None:
         for i, js in enumerate(self.link_nodes):
