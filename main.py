@@ -32,11 +32,11 @@ def map_matching():
     map = Map(log)
 
     if pf_param.ENABLE_DRAW_BEACONS:
-        map.draw_beacons()
+        map.draw_beacons(True)
     if pf_param.ENABLE_SAVE_VIDEO:
         map.init_recorder()
     if param.ENABLE_DRAW_NODES:
-        map.draw_nodes()
+        map.draw_nodes(True)
 
     particles = np.empty(PARTICLE_NUM, dtype=Particle)
     poses = np.empty((PARTICLE_NUM, 2), dtype=np.float16)    # positions
@@ -61,10 +61,9 @@ def map_matching():
         if not pf_param.IS_LOST:
             map.draw_particles(particles, estim_pos)
             map.show()
-            if pf_param.ENABLE_SAVE_VIDEO:
-                map.record()
-
             estim_pos = pf_util.get_likeliest_particle(particles).pos
+        if pf_param.ENABLE_SAVE_VIDEO:
+            map.record()
 
         t += timedelta(seconds=pf_param.WIN_STRIDE)
 

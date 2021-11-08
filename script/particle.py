@@ -1,9 +1,9 @@
 import numpy as np
 from particle_filter.script.particle import Particle as PfParticle
 from particle_filter.script.window import Window
-from .map import Map
-from . import utility as util
 from . import parameter as param
+from . import utility as util
+from .map import Map
 
 
 class Particle(PfParticle):
