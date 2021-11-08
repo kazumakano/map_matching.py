@@ -126,7 +126,7 @@ class Map(PfMap):
 
     def draw_nodes(self, is_never_cleared: bool = False) -> None:
         if not param.ENABLE_DRAW_NODES:
-            raise Warning("map.py: drawing nodes is not enabled but draw_nodes was called")
+            raise Warning("map.py: drawing nodes is not enabled but draw_nodes() was called")
 
         for i, p in enumerate(self.node_poses):
             if param.NODES_SHOW_POLICY == 1:
@@ -142,6 +142,9 @@ class Map(PfMap):
         cv2.line(self.img, self.node_poses[i], self.node_poses[j], (128, 128, 128), 2)
 
     def draw_links(self) -> None:
+        if not param.ENABLE_DRAW_LINKS:
+            raise Warning("map.py: drawing links is not enabled but draw_links() was called")
+
         for i, js in enumerate(self.link_nodes):
             for j in js:
                 self._draw_link(i, j)
