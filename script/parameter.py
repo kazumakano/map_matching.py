@@ -10,6 +10,7 @@ def _set_map_params(conf: dict) -> None:
     MAX_LINK_LEN = np.float16(conf["max_link_len"])           # maximum cost of link
     SET_LINKS_POLICY = conf["set_links_policy"]               # 1: load some irregular links from additional_link.csv and search regular links automatically 
                                                               # 2: load all links from link.csv
+                                                              # 3: load all links from link.pkl
     ENABLE_DRAW_NODES = conf["enable_draw_nodes"]             # draw nodes or not
     NODES_SHOW_POLICY = np.int8(conf["nodes_show_policy"])    # 1: circle, 2: node name
     ENABLE_DRAW_LINKS = conf["enable_draw_links"]             # draw links or not

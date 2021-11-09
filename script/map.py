@@ -1,4 +1,5 @@
 import csv
+import pickle
 from itertools import combinations_with_replacement
 import cv2
 import numpy as np
@@ -103,10 +104,14 @@ class Map(PfMap):
             self._load_links("additional_link.csv")
             self._get_direct_links_from_img()
             self._search_indirect_links()
-        elif param.SET_LINKS_POLICY == 2:    # load all
+        elif param.SET_LINKS_POLICY == 2:    # load all from CSV file
             self._load_links("link.csv")
+        elif param.SET_LINKS_POLICY == 3:    # load all from pickle file
+            with open(param.ROOT_DIR + "map/link.pkl", "rb") as f:
+                self.link_nodes, self.link_costs = pickle.load(f)
+            print(f"map.py: link.pkl has been loaded")
 
-    def export_links(self) -> None:
+    def export_links_as_csv(self) -> None:
         with open(param.ROOT_DIR + "map/link.csv", "w") as f:
             writer = csv.writer(f)
             for i in range(len(self.node_poses)):
@@ -114,6 +119,12 @@ class Map(PfMap):
                     writer.writerow((self.node_names[i], self.node_names[j], self.link_costs[i][index_ij]))
 
         print(f"map.py: links have been exported to link.csv")
+
+    def export_links_as_pkl(self) -> None:
+        with open(param.ROOT_DIR + "map/link.pkl", "wb") as f:
+            pickle.dump((self.link_nodes, self.link_costs), f)
+
+        print(f"map.py: links have been exported to link.pkl")
 
     def get_nearest_node(self, pos: np.ndarray) -> int:
         min_dist = np.inf
