@@ -1,6 +1,5 @@
 import argparse
 from datetime import datetime, timedelta
-from typing import Union
 import numpy as np
 import particle_filter.script.parameter as pf_param
 import script.parameter as param
@@ -24,8 +23,6 @@ def _set_main_params(conf: dict):
     INIT_POS_SD = conf["init_pos_sd"]          # standard deviation of position at initialization
     INIT_DIRECT = conf["init_direct"]          # initial direction [degree]
     INIT_DIRECT_SD = conf["init_direct_sd"]    # standard deviation of direction at initialization
-
-    # map matching
 
 def map_matching():
     log = Log(BEGIN, END)
