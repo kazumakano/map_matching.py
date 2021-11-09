@@ -132,9 +132,7 @@ class Map(PfMap):
 
         for i, p in enumerate(self.node_poses):
             if param.NODES_SHOW_POLICY == 1:
-                if is_never_cleared:
-                    cv2.circle(self.plain_img, p, 3, (128, 128, 128), 6)
-                cv2.circle(self.img, p, 3, (128, 128, 128), 6)
+                self.draw_any_pos(p, (128, 128, 128), is_never_cleared)
             elif param.NODES_SHOW_POLICY == 2:
                 if is_never_cleared:
                     cv2.putText(self.plain_img, self.node_names[i], p, cv2.FONT_HERSHEY_PLAIN, 1, (128, 128, 128), 2, cv2.LINE_AA)
