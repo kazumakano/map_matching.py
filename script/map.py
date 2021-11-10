@@ -62,15 +62,15 @@ class Map(PfMap):
         print(f"map.py: {link_file} has been loaded")
 
     def _get_direct_links_from_img(self) -> None:
-        for n, o in combinations_with_replacement(enumerate(self.node_poses), 2):    # n is (i, node_poses[i])
-            if o[0] not in self.link_nodes[n[0]]:
-                cost = pf_util.calc_dist_by_pos(n[1], o[1])
+        for (i, p), (j, q) in combinations_with_replacement(enumerate(self.node_poses), 2):
+            if j not in self.link_nodes[i]:
+                cost = pf_util.calc_dist_by_pos(p, q)
 
                 if cost < param.MAX_LINK_LEN:
-                    line_iterator = LineIterator(self.plain_img, n[1], o[1])
+                    line_iterator = LineIterator(self.plain_img, p, q)
 
                     if line_iterator.min() > 250:    # if link is on white region
-                        self._set_nodes_and_costs(n[0], o[0], cost)
+                        self._set_nodes_and_costs(i, j, cost)
 
     def _update_nodes_and_costs(self, i: int, j: int, cost: np.float16) -> None:
         if j not in self.link_nodes[i]:
@@ -137,6 +137,12 @@ class Map(PfMap):
                 min_index = i
 
         return min_index
+
+    def get_cost(self, i: int, j: int) -> np.float16:
+        if j in self.link_nodes[i]:
+            return self.link_costs[i][np.where(j == self.link_nodes[i])[0][0]]
+        else:
+            return np.inf
 
     def draw_nodes(self, is_never_cleared: bool = False) -> None:
         if not param.ENABLE_DRAW_NODES:
