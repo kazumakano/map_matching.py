@@ -13,16 +13,16 @@ import particle_filter.script.utility as pf_util
 
 
 def _set_main_params(conf: dict):
-    global BEGIN, END, PARTICLE_NUM, INIT_POS, INIT_POS_SD, INIT_DIRECT, INIT_DIRECT_SD
+    global BEGIN, END, PARTICLE_NUM, INIT_POS, INIT_POS_SD, INIT_DIRECT, INIT_DIRECT_SD, ESTIM_POS_POLICY
 
-    # particle filter
     BEGIN = datetime.strptime(conf["begin"], "%Y-%m-%d %H:%M:%S")
     END = datetime.strptime(conf["end"], "%Y-%m-%d %H:%M:%S")
-    PARTICLE_NUM = conf["particle_num"]        # the number of particles
-    INIT_POS = conf["init_pos"]                # initial position [pixel]
-    INIT_POS_SD = conf["init_pos_sd"]          # standard deviation of position at initialization
-    INIT_DIRECT = conf["init_direct"]          # initial direction [degree]
-    INIT_DIRECT_SD = conf["init_direct_sd"]    # standard deviation of direction at initialization
+    PARTICLE_NUM = conf["particle_num"]            # the number of particles
+    INIT_POS = conf["init_pos"]                    # initial position [pixel]
+    INIT_POS_SD = conf["init_pos_sd"]              # standard deviation of position at initialization
+    INIT_DIRECT = conf["init_direct"]              # initial direction [degree]
+    INIT_DIRECT_SD = conf["init_direct_sd"]        # standard deviation of direction at initialization
+    ESTIM_POS_POLICY = conf["estim_pos_policy"]    # 1: position of likeliest particle, 2: center of gravity of perticles
 
 def map_matching():
     log = Log(BEGIN, END)
@@ -58,7 +58,10 @@ def map_matching():
         if not pf_param.IS_LOST:
             map.draw_particles(particles, estim_pos)
             map.show()
-            estim_pos = pf_util.get_likeliest_particle(particles).pos
+            if ESTIM_POS_POLICY == 1:      # likeliest particle
+                estim_pos = pf_util.get_likeliest_particle(particles).pos
+            elif ESTIM_POS_POLICY == 2:    # center of gravity
+                estim_pos = pf_util.get_center_of_gravity(particles)
         if pf_param.ENABLE_SAVE_VIDEO:
             map.record()
 
