@@ -49,7 +49,7 @@ def map_matching():
         win = Window(log, map, t)
 
         for i in range(PARTICLE_NUM):
-            particles[i] = Particle(map, poses[i], directs[i])
+            particles[i] = Particle(map, poses[i], directs[i], estim_pos)
             particles[i].random_walk()
             particles[i].set_likelihood(map, win, estim_pos)
 
