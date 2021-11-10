@@ -28,18 +28,18 @@ class Map(PfMap):
 
         print(f"map.py: {len(self.node_poses)} nodes found")
 
-        self._set_links()
+        self._set_links()    # prepare lookup table of links
 
     def _init_links(self) -> None:
-        self.link_nodes = np.empty((len(self.node_poses)), dtype=np.ndarray)
-        self.link_costs = np.empty((len(self.node_poses)), dtype=np.ndarray)
+        self.link_nodes = np.empty((len(self.node_poses)), dtype=np.ndarray)    # another node
+        self.link_costs = np.empty((len(self.node_poses)), dtype=np.ndarray)    # length of the link
         for i in range(len(self.node_poses)):
             self.link_nodes[i] = np.empty(0, dtype=np.uint16)
             self.link_costs[i] = np.empty(0, dtype=np.float16)
 
     def _set_nodes_and_costs(self, i: int, j: int, cost: np.float16) -> None:
-        self.link_nodes[i] = np.hstack((self.link_nodes[i], j))       # another node
-        self.link_costs[i] = np.hstack((self.link_costs[i], cost))    # length of the link
+        self.link_nodes[i] = np.hstack((self.link_nodes[i], j))
+        self.link_costs[i] = np.hstack((self.link_costs[i], cost))
         if i != j:
             self.link_nodes[j] = np.hstack((self.link_nodes[j], i))
             self.link_costs[j] = np.hstack((self.link_costs[j], cost))
@@ -62,15 +62,15 @@ class Map(PfMap):
         print(f"map.py: {link_file} has been loaded")
 
     def _get_direct_links_from_img(self) -> None:
-        for c in combinations_with_replacement(enumerate(self.node_poses), 2):    # c is ((i, node_poses[i]), (j, node_poses[j]))
-            if c[1][0] not in self.link_nodes[c[0][0]]:
-                cost = pf_util.calc_dist_by_pos(c[0][1], c[1][1])
+        for n, o in combinations_with_replacement(enumerate(self.node_poses), 2):    # n is (i, node_poses[i])
+            if o[0] not in self.link_nodes[n[0]]:
+                cost = pf_util.calc_dist_by_pos(n[1], o[1])
 
                 if cost < param.MAX_LINK_LEN:
-                    line_iterator = LineIterator(self.plain_img, c[0][1], c[1][1])
+                    line_iterator = LineIterator(self.plain_img, n[1], o[1])
 
                     if line_iterator.min() > 250:    # if link is on white region
-                        self._set_nodes_and_costs(c[0][0], c[1][0], cost)
+                        self._set_nodes_and_costs(n[0], o[0], cost)
 
     def _update_nodes_and_costs(self, i: int, j: int, cost: np.float16) -> None:
         if j not in self.link_nodes[i]:
@@ -78,12 +78,12 @@ class Map(PfMap):
         else:
             index_ij: np.int64 = np.where(j == self.link_nodes[i])[0][0]
             if cost < self.link_costs[i][index_ij]:
-                self.link_costs[i][index_ij] = cost    # update costs if lower
+                self.link_costs[i][index_ij] = cost    # update cost if lower
                 self.link_costs[j][np.where(i == self.link_nodes[j])[0][0]] = cost
 
     def _search_links_recursively(self, node_indexes: np.ndarray, cost: np.float16) -> None:
-        i: np.uint16 = node_indexes[0]
-        j: np.uint16 = node_indexes[-1]
+        i: np.uint16 = node_indexes[0]     # root
+        j: np.uint16 = node_indexes[-1]    # leaf
 
         for index_jk, k in enumerate(self.link_nodes[j]):
             if k in node_indexes:
@@ -100,6 +100,7 @@ class Map(PfMap):
 
     def _set_links(self) -> None:
         self._init_links()
+
         if param.SET_LINKS_POLICY == 1:      # load some irregular and search
             self._load_links("additional_link.csv")
             self._get_direct_links_from_img()
@@ -109,22 +110,22 @@ class Map(PfMap):
         elif param.SET_LINKS_POLICY == 3:    # load all from pickle file
             with open(param.ROOT_DIR + "map/link.pkl", "rb") as f:
                 self.link_nodes, self.link_costs = pickle.load(f)
-            print(f"map.py: link.pkl has been loaded")
+            print("map.py: link.pkl has been loaded")
 
-    def export_links_as_csv(self) -> None:
+    def export_links_to_csv(self) -> None:
         with open(param.ROOT_DIR + "map/link.csv", "w") as f:
             writer = csv.writer(f)
             for i in range(len(self.node_poses)):
                 for index_ij, j in enumerate(self.link_nodes[i]):
                     writer.writerow((self.node_names[i], self.node_names[j], self.link_costs[i][index_ij]))
 
-        print(f"map.py: links have been exported to link.csv")
+        print("map.py: links have been exported to link.csv")
 
-    def export_links_as_pkl(self) -> None:
+    def export_links_to_pkl(self) -> None:
         with open(param.ROOT_DIR + "map/link.pkl", "wb") as f:
             pickle.dump((self.link_nodes, self.link_costs), f)
 
-        print(f"map.py: links have been exported to link.pkl")
+        print("map.py: links have been exported to link.pkl")
 
     def get_nearest_node(self, pos: np.ndarray) -> int:
         min_dist = np.inf
@@ -165,3 +166,5 @@ class Map(PfMap):
 
         if pf_param.SHOW_POLOCY == 6:
             self._draw_link(self.get_nearest_node(last_pos), self.get_nearest_node(pf_util.get_likeliest_particle(particles).pos))
+        if pf_param.SHOW_POLOCY == 7:
+            self._draw_link(self.get_nearest_node(last_pos), self.get_nearest_node(pf_util.get_center_of_gravity(particles)))

@@ -10,9 +10,9 @@ def prepare_links(enable_csv: bool = False, enable_pkl: bool = False) -> None:
     map = Map(Log(datetime(2000, 1, 1), datetime(2000, 1, 1)))    # whenever is fine
 
     if enable_csv:
-        map.export_links_as_csv()
+        map.export_links_to_csv()
     if enable_pkl:
-        map.export_links_as_pkl()
+        map.export_links_to_pkl()
 
     map.draw_links()
     map.show(0)
@@ -20,8 +20,8 @@ def prepare_links(enable_csv: bool = False, enable_pkl: bool = False) -> None:
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-c", "--config", help="specify your config file", metavar="PATH_TO_CONFIG_FILE")
-    parser.add_argument("--csv", action="store_true", help="export as CSV file")
-    parser.add_argument("--pkl", action="store_true", help="export as pickle file")
+    parser.add_argument("--csv", action="store_true", help="export to CSV file")
+    parser.add_argument("--pkl", action="store_true", help="export to pickle file")
     args = parser.parse_args()
 
     if (not args.csv) and (not args.pkl):
