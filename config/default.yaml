@@ -2,6 +2,13 @@
 begin: "2021-10-08 14:56:00"
 end: "2021-10-08 15:18:00"
 
+# map
+enable_draw_nodes: False
+enable_draw_links: False
+max_link_len: 80
+set_links_policy: 3
+nodes_show_policy: 2
+
 # particle
 particle_num: 256
 init_pos: [1300, 900]
@@ -12,13 +19,6 @@ rand_pos_range: 512
 match_weight_policy: 3
 min_vanilla_lh: 0.005
 estim_pos_policy: 1
-
-# map
-enable_draw_nodes: False
-enable_draw_links: False
-max_link_len: 80
-set_links_policy: 3
-nodes_show_policy: 2
 
 # particle filter
 enable_truth: False
