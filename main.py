@@ -68,11 +68,11 @@ def map_matching():
         t += timedelta(seconds=pf_param.WIN_STRIDE)
 
     print("main.py: reached end of log")
-    map.show(0)
     if pf_param.ENABLE_SAVE_VIDEO:
         map.save_video()
     if pf_param.ENABLE_SAVE_IMG:
         map.save_img()
+    map.show(0)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
