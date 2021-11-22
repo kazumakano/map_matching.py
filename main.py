@@ -2,6 +2,7 @@ import argparse
 from datetime import datetime, timedelta
 import numpy as np
 import particle_filter.script.parameter as pf_param
+import particle_filter.script.utility as pf_util
 import script.parameter as param
 from particle_filter.script.log import Log
 from particle_filter.script.resample import resample
@@ -9,7 +10,6 @@ from particle_filter.script.window import Window
 from script.map import Map
 from script.parameter import set_params
 from script.particle import Particle
-import particle_filter.script.utility as pf_util
 
 
 def _set_main_params(conf: dict):
