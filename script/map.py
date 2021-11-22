@@ -170,7 +170,7 @@ class Map(PfMap):
     def draw_particles(self, particles: np.ndarray, last_pos: np.ndarray) -> None:
         super().draw_particles(particles)
 
-        if pf_param.SHOW_POLOCY == 6:
+        if pf_param.SHOW_POLICY == 6:
             self._draw_link(self.get_nearest_node(last_pos), self.get_nearest_node(pf_util.get_likeliest_particle(particles).pos))
-        if pf_param.SHOW_POLOCY == 7:
+        if pf_param.SHOW_POLICY == 7:
             self._draw_link(self.get_nearest_node(last_pos), self.get_nearest_node(pf_util.get_center_of_gravity(particles)))
