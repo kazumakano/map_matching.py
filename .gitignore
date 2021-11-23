@@ -1,4 +1,5 @@
 config/
+map/
 
 # for macOS
 .DS_Store
