@@ -12,7 +12,7 @@ python main.py [--config PATH_TO_CONFIG_FILE]
 
 ### prepare_links.py
 You can prepare link file in advance.
-Then, you can reuse it when creating instance of Map class instead of constructing it.
+Then, you can reuse it when creating instance of `Map` class instead of constructing it.
 CSV and pickle are supported.
 
 You can run preparer with following command.
