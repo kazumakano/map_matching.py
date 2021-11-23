@@ -16,11 +16,10 @@ def _set_map_params(conf: dict) -> None:
     ENABLE_DRAW_LINKS = conf["enable_draw_links"]             # draw links or not
 
 def _set_particle_params(conf: dict) -> None:
-    global RAND_POS_RANGE, MATCH_WEIGHT_POLICY, MIN_VANILLA_LH
+    global RAND_POS_RANGE, MATCH_WEIGHT_POLICY
 
     RAND_POS_RANGE = conf["rand_pos_range"]                   # range from last estimated position at random initialization of particle position (0 means all map)
     MATCH_WEIGHT_POLICY = conf["match_weight_policy"]         # 1, 2: multi match weight, 3: pass or cut off
-    MIN_VANILLA_LH = np.float64(conf["min_vanilla_lh"])       # minimum likelihood without match weight
 
 def set_params(conf_file: Union[str, None] = None) -> dict:
     global ROOT_DIR
