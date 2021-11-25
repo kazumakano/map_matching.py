@@ -55,9 +55,9 @@ class Map(PfMap):
                     cost = np.float16(row[2])
                 except:
                     raise Warning(f"map.py: error occurred when loading {row}")
-
-                if j not in self.link_nodes[i] and cost < param.MAX_LINK_LEN:    # not to deplicate
-                    self._set_nodes_and_costs(i, j, cost)
+                else:
+                    if j not in self.link_nodes[i] and cost < param.MAX_LINK_LEN:    # not to deplicate
+                        self._set_nodes_and_costs(i, j, cost)
 
         print(f"map.py: {link_file} has been loaded")
 
