@@ -1,4 +1,5 @@
 import csv
+import os.path as path
 import pickle
 from itertools import combinations_with_replacement
 import cv2
@@ -16,7 +17,7 @@ class Map(PfMap):
     def __init__(self, log: Log) -> None:
         super().__init__(log)
 
-        with open(param.ROOT_DIR + "map/node.yaml") as f:
+        with open(path.join(param.ROOT_DIR, "map/node.yaml")) as f:
             node_conf: dict = yaml.safe_load(f)
         self.node_poses = np.empty((len(node_conf), 2), dtype=int)
         self.node_names = np.empty(len(node_conf), dtype=object)    # any length string
@@ -46,7 +47,7 @@ class Map(PfMap):
 
     # load links from link file
     def _load_links(self, link_file: str) -> None:
-        with open(param.ROOT_DIR + "/map/" + link_file) as f:
+        with open(path.join(param.ROOT_DIR, "map/", link_file)) as f:
             reader = csv.reader(f)
             for row in reader:
                 try:
@@ -108,12 +109,12 @@ class Map(PfMap):
         elif param.SET_LINKS_POLICY == 2:    # load all from CSV file
             self._load_links("link.csv")
         elif param.SET_LINKS_POLICY == 3:    # load all from pickle file
-            with open(param.ROOT_DIR + "map/link.pkl", "rb") as f:
+            with open(path.join(param.ROOT_DIR, "map/link.pkl"), "rb") as f:
                 self.link_nodes, self.link_costs = pickle.load(f)
             print("map.py: link.pkl has been loaded")
 
     def export_links_to_csv(self) -> None:
-        with open(param.ROOT_DIR + "map/link.csv", "w") as f:
+        with open(path.join(param.ROOT_DIR, "map/link.csv"), "w") as f:
             writer = csv.writer(f)
             for i in range(len(self.node_poses)):
                 for index_ij, j in enumerate(self.link_nodes[i]):
@@ -122,7 +123,7 @@ class Map(PfMap):
         print("map.py: links have been exported to link.csv")
 
     def export_links_to_pkl(self) -> None:
-        with open(param.ROOT_DIR + "map/link.pkl", "wb") as f:
+        with open(path.join(param.ROOT_DIR, "map/link.pkl"), "wb") as f:
             pickle.dump((self.link_nodes, self.link_costs), f)
 
         print("map.py: links have been exported to link.pkl")
