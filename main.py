@@ -17,12 +17,12 @@ def _set_main_params(conf: dict):
 
     BEGIN = datetime.strptime(conf["begin"], "%Y-%m-%d %H:%M:%S")
     END = datetime.strptime(conf["end"], "%Y-%m-%d %H:%M:%S")
-    PARTICLE_NUM = conf["particle_num"]            # the number of particles
-    INIT_POS = conf["init_pos"]                    # initial position [pixel]
-    INIT_POS_SD = conf["init_pos_sd"]              # standard deviation of position at initialization
-    INIT_DIRECT = conf["init_direct"]              # initial direction [degree]
-    INIT_DIRECT_SD = conf["init_direct_sd"]        # standard deviation of direction at initialization
-    ESTIM_POS_POLICY = conf["estim_pos_policy"]    # 1: position of likeliest particle, 2: center of gravity of perticles
+    PARTICLE_NUM = np.uint16(conf["particle_num"])             # the number of particles
+    INIT_POS = np.array(conf["init_pos"], dtype=np.float16)    # initial position [pixel]
+    INIT_POS_SD = np.float16(conf["init_pos_sd"])              # standard deviation of position at initialization
+    INIT_DIRECT = np.float16(conf["init_direct"])              # initial direction [degree]
+    INIT_DIRECT_SD = np.float16(conf["init_direct_sd"])        # standard deviation of direction at initialization
+    ESTIM_POS_POLICY = np.int8(conf["estim_pos_policy"])       # 1: position of likeliest particle, 2: center of gravity of perticles
 
 def map_matching():
     log = Log(BEGIN, END)
