@@ -59,7 +59,7 @@ def map_matching():
             map.draw_particles(particles, estim_pos)
             map.show()
             if ESTIM_POS_POLICY == 1:      # likeliest particle
-                estim_pos = pf_util.get_likeliest_particle(particles).pos
+                estim_pos: np.ndarray = pf_util.get_likeliest_particle(particles).pos
             elif ESTIM_POS_POLICY == 2:    # center of gravity
                 estim_pos = pf_util.get_center_of_gravity(particles)
         if pf_param.ENABLE_SAVE_VIDEO:
@@ -68,10 +68,10 @@ def map_matching():
         t += timedelta(seconds=pf_param.WIN_STRIDE)
 
     print("main.py: reached end of log")
-    if pf_param.ENABLE_SAVE_VIDEO:
-        map.save_video()
     if pf_param.ENABLE_SAVE_IMG:
         map.save_img()
+    if pf_param.ENABLE_SAVE_VIDEO:
+        map.save_video()
     map.show(0)
 
 if __name__ == "__main__":
@@ -80,4 +80,5 @@ if __name__ == "__main__":
 
     conf = set_params(parser.parse_args().config)
     _set_main_params(conf)
+
     map_matching()

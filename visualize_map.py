@@ -1,4 +1,5 @@
 import argparse
+import os.path as path
 from datetime import datetime
 from glob import iglob
 import numpy as np
@@ -11,7 +12,7 @@ from script.parameter import set_params
 
 
 def _set_beacons(map: Map) -> None:
-    for beacon_file in iglob(pf_param.ROOT_DIR + "map/beacon/*.yaml"):
+    for beacon_file in iglob(path.join(pf_param.ROOT_DIR, "map/beacon/*.yaml")):
         with open(beacon_file) as f:
             beacon_conf: dict = yaml.safe_load(f)
         map.beacon_pos_list = np.vstack((map.beacon_pos_list, beacon_conf["rotated_position"][0:2]))
