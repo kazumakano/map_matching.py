@@ -19,9 +19,9 @@ class Map(PfMap):
 
         with open(path.join(param.ROOT_DIR, "map/node.yaml")) as f:
             node_conf: dict = yaml.safe_load(f)
-        self.node_poses = np.empty((len(node_conf), 2), dtype=int)
+        self.node_poses = np.empty((len(node_conf), 2), dtype=np.uint16)
         self.node_names = np.empty(len(node_conf), dtype=object)    # any length string
-        i: int = 0
+        i = 0
         for k, v in node_conf.items():
             self.node_poses[i] = v
             self.node_names[i] = str(k)
@@ -38,7 +38,7 @@ class Map(PfMap):
             self.link_nodes[i] = np.empty(0, dtype=np.uint16)
             self.link_costs[i] = np.empty(0, dtype=np.float16)
 
-    def _set_nodes_and_costs(self, i: int, j: int, cost: np.float16) -> None:
+    def _set_nodes_and_costs(self, i: np.uint16, j: np.uint16, cost: np.float16) -> None:
         self.link_nodes[i] = np.hstack((self.link_nodes[i], j))
         self.link_costs[i] = np.hstack((self.link_costs[i], cost))
         if i != j:
@@ -51,8 +51,8 @@ class Map(PfMap):
             reader = csv.reader(f)
             for row in reader:
                 try:
-                    i = np.where(row[0] == self.node_names)[0][0]
-                    j = np.where(row[1] == self.node_names)[0][0]
+                    i = np.uint16(np.where(row[0] == self.node_names)[0][0])
+                    j = np.uint16(np.where(row[1] == self.node_names)[0][0])
                     cost = np.float16(row[2])
                 except:
                     raise Warning(f"map.py: error occurred when loading {row}")
@@ -73,13 +73,13 @@ class Map(PfMap):
                     if line_iterator.min() > 250:    # if link is on white region
                         self._set_nodes_and_costs(i, j, cost)
 
-    def _update_nodes_and_costs(self, i: int, j: int, cost: np.float16) -> None:
+    def _update_nodes_and_costs(self, i: np.uint16, j: np.uint16, cost: np.float16) -> None:
         if j not in self.link_nodes[i]:
-            self._set_nodes_and_costs(i, j, cost)    # set nodes and costs if new
+            self._set_nodes_and_costs(i, j, cost)    # set nodes and costs
         else:
-            index_ij: np.int64 = np.where(j == self.link_nodes[i])[0][0]
+            index_ij: int = np.where(j == self.link_nodes[i])[0][0]
             if cost < self.link_costs[i][index_ij]:
-                self.link_costs[i][index_ij] = cost    # update cost if lower
+                self.link_costs[i][index_ij] = cost    # update cost
                 self.link_costs[j][np.where(i == self.link_nodes[j])[0][0]] = cost
 
     def _search_links_recursively(self, node_indexes: np.ndarray, cost: np.float16) -> None:
@@ -111,26 +111,12 @@ class Map(PfMap):
         elif param.SET_LINKS_POLICY == 3:    # load all from pickle file
             with open(path.join(param.ROOT_DIR, "map/link.pkl"), "rb") as f:
                 self.link_nodes, self.link_costs = pickle.load(f)
+
             print("map.py: link.pkl has been loaded")
-
-    def export_links_to_csv(self) -> None:
-        with open(path.join(param.ROOT_DIR, "map/link.csv"), "w") as f:
-            writer = csv.writer(f)
-            for i in range(len(self.node_poses)):
-                for index_ij, j in enumerate(self.link_nodes[i]):
-                    writer.writerow((self.node_names[i], self.node_names[j], self.link_costs[i][index_ij]))
-
-        print("map.py: links have been exported to link.csv")
-
-    def export_links_to_pkl(self) -> None:
-        with open(path.join(param.ROOT_DIR, "map/link.pkl"), "wb") as f:
-            pickle.dump((self.link_nodes, self.link_costs), f)
-
-        print("map.py: links have been exported to link.pkl")
 
     def get_nearest_node(self, pos: np.ndarray) -> int:
         min_dist = np.inf
-        min_index: int = -1
+        min_index = -1
         for i, p in enumerate(self.node_poses):
             dist = pf_util.calc_dist_by_pos(pos, p)
             if dist < min_dist:
@@ -139,7 +125,7 @@ class Map(PfMap):
 
         return min_index
 
-    def get_cost(self, i: int, j: int) -> np.float16:
+    def get_cost(self, i: int, j: int) -> np.float64:
         if j in self.link_nodes[i]:
             return self.link_costs[i][np.where(j == self.link_nodes[i])[0][0]]
         else:
@@ -151,7 +137,7 @@ class Map(PfMap):
 
         for i, p in enumerate(self.node_poses):
             if param.NODES_SHOW_POLICY == 1:
-                self.draw_any_pos(p, (128, 128, 128), is_never_cleared)
+                self._draw_any_pos(p, (128, 128, 128), is_never_cleared)
             elif param.NODES_SHOW_POLICY == 2:
                 if is_never_cleared:
                     cv2.putText(self.plain_img, self.node_names[i], p, cv2.FONT_HERSHEY_PLAIN, 1, (128, 128, 128), 2, cv2.LINE_AA)
@@ -175,3 +161,18 @@ class Map(PfMap):
             self._draw_link(self.get_nearest_node(last_pos), self.get_nearest_node(pf_util.get_likeliest_particle(particles).pos))
         if pf_param.SHOW_POLICY == 7:
             self._draw_link(self.get_nearest_node(last_pos), self.get_nearest_node(pf_util.get_center_of_gravity(particles)))
+
+    def export_links_to_csv(self) -> None:
+        with open(path.join(param.ROOT_DIR, "map/link.csv"), "w") as f:
+            writer = csv.writer(f)
+            for i in range(len(self.node_poses)):
+                for index_ij, j in enumerate(self.link_nodes[i]):
+                    writer.writerow((self.node_names[i], self.node_names[j], self.link_costs[i][index_ij]))
+
+        print("map.py: links have been exported to link.csv")
+
+    def export_links_to_pkl(self) -> None:
+        with open(path.join(param.ROOT_DIR, "map/link.pkl"), "wb") as f:
+            pickle.dump((self.link_nodes, self.link_costs), f)
+
+        print("map.py: links have been exported to link.pkl")

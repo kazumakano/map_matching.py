@@ -8,7 +8,7 @@ from .map import Map
 
 
 class Particle(PfParticle):
-    def __init__(self, map: Map, init_pos: np.ndarray = np.full(2, np.nan, dtype=np.float16), init_direct: np.float16 = np.nan, last_pos: np.ndarray = np.full(2, np.nan, dtype=np.float16)) -> None:
+    def __init__(self, map: Map, init_pos: np.ndarray = np.full(2, np.nan, dtype=np.float16), init_direct: np.float16 = np.float16(np.nan), last_pos: np.ndarray = np.full(2, np.nan, dtype=np.float16)) -> None:
         if np.isnan(init_pos[0]):
             if param.RAND_POS_RANGE == 0 or np.isnan(last_pos[0]):
                 self.pos: np.ndarray = (map.img.shape[0:2] * np.random.rand(2)).astype(np.float16)    # uniform distribution in map
@@ -27,7 +27,7 @@ class Particle(PfParticle):
 
         if not pf_param.IS_LOST:    # don't consider match weight with old position
             if param.MATCH_WEIGHT_POLICY == 1:      # multiply maximum match weight between nodes linked with last node and self node
-                max_match_weight: np.float64 = 0
+                max_match_weight = 0
                 for i in map.link_nodes[map.get_nearest_node(last_pos)]:
                     match_weight = pf_util.calc_prob_weight(map.get_cost(i, map.get_nearest_node(self.pos)), 0)
                     if match_weight > max_match_weight:
