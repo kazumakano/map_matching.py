@@ -17,6 +17,10 @@ class Map(PfMap):
     def __init__(self, log: Log) -> None:
         super().__init__(log)
 
+        self._set_nodes()
+        self._set_links()    # prepare lookup table of links
+
+    def _set_nodes(self) -> None:
         with open(path.join(param.ROOT_DIR, "map/node.yaml")) as f:
             node_conf: dict = yaml.safe_load(f)
         self.node_poses = np.empty((len(node_conf), 2), dtype=np.uint16)
@@ -29,8 +33,6 @@ class Map(PfMap):
 
         print(f"map.py: {len(self.node_poses)} nodes found")
 
-        self._set_links()    # prepare lookup table of links
-
     def _init_links(self) -> None:
         self.link_nodes = np.empty((len(self.node_poses)), dtype=np.ndarray)    # another node
         self.link_costs = np.empty((len(self.node_poses)), dtype=np.ndarray)    # length of the link
@@ -38,7 +40,7 @@ class Map(PfMap):
             self.link_nodes[i] = np.empty(0, dtype=np.uint16)
             self.link_costs[i] = np.empty(0, dtype=np.float16)
 
-    def _set_nodes_and_costs(self, i: np.uint16, j: np.uint16, cost: np.float16) -> None:
+    def _set_link_nodes_and_costs(self, i: np.uint16, j: np.uint16, cost: np.float16) -> None:
         self.link_nodes[i] = np.hstack((self.link_nodes[i], j))
         self.link_costs[i] = np.hstack((self.link_costs[i], cost))
         if i != j:
@@ -58,7 +60,7 @@ class Map(PfMap):
                     raise Warning(f"map.py: error occurred when loading {row}")
                 else:
                     if j not in self.link_nodes[i] and cost < param.MAX_LINK_LEN:    # not to deplicate
-                        self._set_nodes_and_costs(i, j, cost)
+                        self._set_link_nodes_and_costs(i, j, cost)
 
         print(f"map.py: {link_file} has been loaded")
 
@@ -71,11 +73,11 @@ class Map(PfMap):
                     line_iterator = LineIterator(self.plain_img, p, q)
 
                     if line_iterator.min() > 250:    # if link is on white region
-                        self._set_nodes_and_costs(i, j, cost)
+                        self._set_link_nodes_and_costs(i, j, cost)
 
-    def _update_nodes_and_costs(self, i: np.uint16, j: np.uint16, cost: np.float16) -> None:
+    def _update_link_nodes_and_costs(self, i: np.uint16, j: np.uint16, cost: np.float16) -> None:
         if j not in self.link_nodes[i]:
-            self._set_nodes_and_costs(i, j, cost)    # set nodes and costs
+            self._set_link_nodes_and_costs(i, j, cost)    # set nodes and costs
         else:
             index_ij: int = np.where(j == self.link_nodes[i])[0][0]
             if cost < self.link_costs[i][index_ij]:
@@ -92,7 +94,7 @@ class Map(PfMap):
 
             cost_sum: np.float16 = cost + self.link_costs[j][index_jk]
             if cost_sum < param.MAX_LINK_LEN:
-                self._update_nodes_and_costs(i, k, cost_sum)
+                self._update_link_nodes_and_costs(i, k, cost_sum)
                 self._search_links_recursively(np.hstack((node_indexes, k)), cost_sum)
 
     def _search_indirect_links(self) -> None:
