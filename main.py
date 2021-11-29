@@ -30,10 +30,10 @@ def map_matching():
 
     if pf_param.ENABLE_DRAW_BEACONS:
         map.draw_beacons(True)
-    if pf_param.ENABLE_SAVE_VIDEO:
-        map.init_recorder()
     if param.ENABLE_DRAW_NODES:
         map.draw_nodes(True)
+    if pf_param.ENABLE_SAVE_VIDEO:
+        map.init_recorder()
 
     particles = np.empty(PARTICLE_NUM, dtype=Particle)
     poses = np.empty((PARTICLE_NUM, 2), dtype=np.float16)    # positions
