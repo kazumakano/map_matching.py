@@ -23,7 +23,7 @@ class Map(PfMap):
     def _set_nodes(self) -> None:
         with open(path.join(param.ROOT_DIR, "map/node.yaml")) as f:
             node_conf: dict = yaml.safe_load(f)
-        self.node_poses = np.empty((len(node_conf), 2), dtype=np.uint16)
+        self.node_poses = np.empty((len(node_conf), 2), dtype=np.int16)
         self.node_names = np.empty(len(node_conf), dtype=object)    # any length string
         i = 0
         for k, v in node_conf.items():
