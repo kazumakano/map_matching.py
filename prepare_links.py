@@ -1,9 +1,6 @@
-import argparse
 from datetime import datetime
-import script.parameter as param
 from particle_filter.script.log import Log
 from script.map import Map
-from script.parameter import set_params
 
 
 def prepare_links(enable_csv: bool = False, enable_pkl: bool = False) -> None:
@@ -18,6 +15,10 @@ def prepare_links(enable_csv: bool = False, enable_pkl: bool = False) -> None:
     map.show(0)
 
 if __name__ == "__main__":
+    import argparse
+    import script.parameter as param
+    from script.parameter import set_params
+
     parser = argparse.ArgumentParser()
     parser.add_argument("-c", "--config", help="specify your config file", metavar="PATH_TO_CONFIG_FILE")
     parser.add_argument("--csv", action="store_true", help="export to CSV file")

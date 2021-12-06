@@ -7,7 +7,6 @@ from particle_filter.script.log import Log
 from particle_filter.script.resample import resample
 from particle_filter.script.window import Window
 from script.map import Map
-from script.parameter import set_params
 from script.particle import Particle
 
 
@@ -75,6 +74,7 @@ def map_matching():
 
 if __name__ == "__main__":
     import argparse
+    from script.parameter import set_params
 
     parser = argparse.ArgumentParser()
     parser.add_argument("-c", "--config", help="specify your config file", metavar="PATH_TO_CONFIG_FILE")
