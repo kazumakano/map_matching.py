@@ -1,4 +1,3 @@
-import argparse
 import os.path as path
 from datetime import datetime
 from glob import iglob
@@ -8,7 +7,6 @@ import particle_filter.script.parameter as pf_param
 import script.parameter as param
 from particle_filter.script.log import Log
 from script.map import Map
-from script.parameter import set_params
 
 
 def _set_beacons(map: Map) -> None:
@@ -34,6 +32,9 @@ def vis_map() -> None:
     map.show(0)
 
 if __name__ == "__main__":
+    import argparse
+    from script.parameter import set_params
+
     parser = argparse.ArgumentParser()
     parser.add_argument("-c", "--config", help="specify your config file", metavar="PATH_TO_CONFIG_FILE")
     parser.add_argument("-b", "--beacon", action="store_true", help="enable draw beacons")
