@@ -1,2 +1,4 @@
-config/
-map/
+config/*
+!config/README.md
+map/*
+!map/README.md
