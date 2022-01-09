@@ -2,8 +2,8 @@ import numpy as np
 import particle_filter.script.parameter as pf_param
 import particle_filter.script.utility as pf_util
 from particle_filter.script.particle import Particle as PfParticle
-from .map import Map
 from . import parameter as param
+from .map import Map
 
 
 class Particle(PfParticle):
