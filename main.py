@@ -49,7 +49,7 @@ def map_matching():
         win = Window(t, log, map.resolution)
 
         for i in range(PARTICLE_NUM):
-            particles[i] = Particle(map.img.shape[0:2], estim_pos, poses[i], directs[i])
+            particles[i] = Particle(map.img.shape[:2], estim_pos, poses[i], directs[i])
             particles[i].random_walk()
             particles[i].set_likelihood(estim_pos, map, win.strength_weight_list, win.subject_dist_list)
 
