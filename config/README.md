@@ -47,7 +47,7 @@ You can customize following parameters:
 | enable_draw_nodes    | draw nodes or not                                    |                                                                                                         | `bool`        |
 | max_link_len         | maximum cost between 2 nodes to be linked            |                                                                                                         | `float`       |
 | nodes_show_policy    | policy to show nodes                                 | 1: circle, 2: node name                                                                                 | `int`         |
-| set_links_policy     | policy to set links                                  | 1: load irregular from csv and search regular, 2: load all from csv, 3: load all from pkl               | `int`         |
+| set_links_policy     | policy to set links                                  | 1: load irregular from csv and search regular, 2: load all from CSV, 3: load all from pickle            | `int`         |
 |                      |                                                      |                                                                                                         |               |
 | match_weight_policy  | policy to calculate likelihood with map match weight | 1, 2: multiply match weight between nearest node and last linked node, last node 3: pass or cut off     | `int`         |
 | rand_pos_range       | range from last position at initialization [pixel]   | whole map if 0                                                                                          | `float`       |
