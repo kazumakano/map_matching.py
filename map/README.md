@@ -3,7 +3,7 @@
 This is file to add irregular links which can not be automatically constructed.
 
 ### Format
-This file must have 3 columns; first node name, second node name and cost of link between them.
+This file must have 3 columns; first node name, second node name, and cost of link between them.
 You don't need to add `n2,n1,100` if you have already added `n1,n2,100`.
 
 ## link.csv
