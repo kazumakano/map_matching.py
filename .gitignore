@@ -1,5 +1,7 @@
 config/*
 !config/README.md
-map/*
-!map/README.md
+map/additional_link.csv
+map/link.csv
+map/link.pkl
+map/node.yaml
 script/__pycache__/
