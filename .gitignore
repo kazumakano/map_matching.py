@@ -2,3 +2,4 @@ config/*
 !config/README.md
 map/*
 !map/README.md
+script/__pycache__/
