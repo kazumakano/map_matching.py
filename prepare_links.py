@@ -1,10 +1,13 @@
+import os.path as path
 from datetime import datetime
+from glob import glob
+import particle_filter.script.parameter as pf_param
 from particle_filter.script.log import Log
 from script.map import Map
 
 
 def prepare_links(enable_csv: bool = False, enable_pkl: bool = False) -> None:
-    map = Map(Log(datetime(2000, 1, 1), datetime(2000, 1, 1)))    # whenever is fine
+    map = Map(Log(datetime(2000, 1, 1), datetime(2000, 1, 1), glob(path.join(pf_param.ROOT_DIR, "log/observed/*.csv"))[0]).mac_list)    # whatever is fine
 
     if enable_csv:
         map.export_links_to_csv()
@@ -20,7 +23,7 @@ if __name__ == "__main__":
     from script.parameter import set_params
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("-c", "--config", help="specify your config file", metavar="PATH_TO_CONFIG_FILE")
+    parser.add_argument("-c", "--conf_file", help="specify config file", metavar="PATH_TO_CONF_FILE")
     parser.add_argument("--csv", action="store_true", help="export to CSV file")
     parser.add_argument("--pkl", action="store_true", help="export to pickle file")
     args = parser.parse_args()
@@ -28,8 +31,8 @@ if __name__ == "__main__":
     if (not args.csv) and (not args.pkl):
         raise Warning("prepare_links.py: set flags in order to export")
 
-    set_params(args.config)
-    param.SET_LINKS_POLICY = 1
+    set_params(args.conf_file)
     param.ENABLE_DRAW_LINKS = True
+    param.SET_LINKS_POLICY = 1
 
     prepare_links(args.csv, args.pkl)
