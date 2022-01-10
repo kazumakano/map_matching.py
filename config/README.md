@@ -41,8 +41,6 @@ You can customize following parameters:
 |                      |                                                      |                                                                                                         |               |
 | win_policy           | policy to get representative RSSI value in window    | 1: maximum, 2: latest                                                                                   | `int`         |
 |                      |                                                      |                                                                                                         |               |
-| estim_pos_policy     | policy to estimate subject's position                | 1: position of likeliest particle, 2: center of gravity of perticles                                    | `int`         |
-|                      |                                                      |                                                                                                         |               |
 | enable_draw_links    | draw links or not                                    |                                                                                                         | `bool`        |
 | enable_draw_nodes    | draw nodes or not                                    |                                                                                                         | `bool`        |
 | max_link_len         | maximum cost between 2 nodes to be linked            |                                                                                                         | `float`       |
@@ -51,3 +49,5 @@ You can customize following parameters:
 |                      |                                                      |                                                                                                         |               |
 | match_weight_policy  | policy to calculate likelihood with map match weight | 1, 2: multiply match weight between nearest node and last linked node, last node 3: pass or cut off     | `int`         |
 | rand_pos_range       | range from last position at initialization [pixel]   | whole map if 0                                                                                          | `float`       |
+|                      |                                                      |                                                                                                         |               |
+| estim_pos_policy     | policy to estimate subject's position                | 1: position of likeliest particle, 2: center of gravity of perticles                                    | `int`         |

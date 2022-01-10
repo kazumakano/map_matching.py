@@ -2,8 +2,8 @@ import os.path as path
 from datetime import datetime, timedelta
 import numpy as np
 import particle_filter.script.parameter as pf_param
-import particle_filter.script.utility as pf_util
 import script.parameter as param
+import script.utility as util
 from particle_filter.script.log import Log
 from particle_filter.script.resample import resample
 from particle_filter.script.window import Window
@@ -12,12 +12,11 @@ from script.particle import Particle
 
 
 def _set_main_params(conf: dict):
-    global BEGIN, END, LOG_FILE, ESTIM_POS_POLICY, INIT_DIRECT, INIT_DIRECT_SD, INIT_POS, INIT_POS_SD, PARTICLE_NUM
+    global BEGIN, END, LOG_FILE, INIT_DIRECT, INIT_DIRECT_SD, INIT_POS, INIT_POS_SD, PARTICLE_NUM
 
     BEGIN = datetime.strptime(conf["begin"], "%Y-%m-%d %H:%M:%S")
     END = datetime.strptime(conf["end"], "%Y-%m-%d %H:%M:%S")
     LOG_FILE = str(conf["log_file"])
-    ESTIM_POS_POLICY = np.int8(conf["estim_pos_policy"])
     INIT_DIRECT = np.float16(conf["init_direct"])
     INIT_DIRECT_SD = np.float16(conf["init_direct_sd"])
     INIT_POS = np.array(conf["init_pos"], dtype=np.float16)
@@ -58,10 +57,7 @@ def map_matching():
         if not pf_param.IS_LOST:
             map.draw_particles(estim_pos, particles)
             map.show()
-            if ESTIM_POS_POLICY == 1:      # position of likeliest particle
-                estim_pos: np.ndarray = pf_util.get_likeliest_particle(particles).pos
-            elif ESTIM_POS_POLICY == 2:    # center of gravity of particles
-                estim_pos = pf_util.get_center_of_gravity(particles)
+            estim_pos = util.estim_pos(particles)
         if pf_param.ENABLE_SAVE_VIDEO:
             map.record()
 

@@ -34,8 +34,6 @@ propag_coef: 4
 
 win_policy: 1
 
-estim_pos_policy: 1
-
 enable_draw_links: False
 enable_draw_nodes: False
 max_link_len: 80
@@ -44,3 +42,5 @@ set_links_policy: 3
 
 match_weight_policy: 1
 rand_pos_range: 512
+
+estim_pos_policy: 1
