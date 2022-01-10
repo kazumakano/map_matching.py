@@ -2,6 +2,7 @@ import csv
 import os.path as path
 import pickle
 from itertools import combinations_with_replacement
+from typing import Any
 import cv2
 import numpy as np
 import particle_filter.script.parameter as pf_param
@@ -21,7 +22,7 @@ class Map(PfMap):
 
     def _set_nodes(self) -> None:
         with open(path.join(param.ROOT_DIR, "map/node.yaml")) as f:
-            node_conf: dict = yaml.safe_load(f)
+            node_conf: dict[Any, list[int]] = yaml.safe_load(f)
         self.node_poses = np.empty((len(node_conf), 2), dtype=np.int16)
         self.node_names = np.empty(len(node_conf), dtype=object)    # any length string
         i = 0

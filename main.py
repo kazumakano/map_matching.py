@@ -1,5 +1,6 @@
 import os.path as path
 from datetime import datetime, timedelta
+from typing import Any
 import numpy as np
 import particle_filter.script.parameter as pf_param
 import script.parameter as param
@@ -11,7 +12,7 @@ from script.map import Map
 from script.particle import Particle
 
 
-def _set_main_params(conf: dict):
+def _set_main_params(conf: dict[str, Any]) -> None:
     global BEGIN, END, LOG_FILE, INIT_DIRECT, INIT_DIRECT_SD, INIT_POS, INIT_POS_SD, PARTICLE_NUM
 
     BEGIN = datetime.strptime(conf["begin"], "%Y-%m-%d %H:%M:%S")
@@ -23,7 +24,7 @@ def _set_main_params(conf: dict):
     INIT_POS_SD = np.float16(conf["init_pos_sd"])
     PARTICLE_NUM = np.int16(conf["particle_num"])
 
-def map_matching():
+def map_matching() -> None:
     log = Log(BEGIN, END, path.join(pf_param.ROOT_DIR, "log/observed/", LOG_FILE))
     map = Map(log.mac_list)
 
