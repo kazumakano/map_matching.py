@@ -1,5 +1,5 @@
 # map_matching.py
-This is Python module to estimate subject position with particle filter and map matching.
+This is Python module to estimate subject's position with particle filter and map matching.
 
 ## Usage
 ### main.py
