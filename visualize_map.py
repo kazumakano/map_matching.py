@@ -44,7 +44,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     if (not args.beacon) and (not args.node) and (not args.link):
-        raise Warning("visualize_nodes_and_links.py: set flags in order to visualize")
+        raise Warning("visualize_map.py: set flags in order to visualize")
 
     set_params(args.conf_file)
     pf_param.ENABLE_DRAW_BEACONS = args.beacon
