@@ -175,7 +175,4 @@ class Map(PfMap):
         print("map.py: links have been exported to link.pkl")
 
     def get_cost(self, i: int, j: int) -> np.float64:
-        if j in self.link_nodes[i]:
-            return self.link_costs[i][np.where(j == self.link_nodes[i])[0][0]]
-        else:
-            return np.inf
+        return self.link_costs[i][np.where(j == self.link_nodes[i])[0][0]] if j in self.link_nodes[i] else np.inf

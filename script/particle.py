@@ -16,10 +16,7 @@ class Particle(PfParticle):
         else:
             self.pos = init_pos
 
-        if np.isnan(init_direct):
-            self.direct = np.float16(360 * np.random.rand())    # uniform distribution in (0, 360)
-        else:
-            self.direct = init_direct
+        self.direct = np.float16(360 * np.random.rand()) if np.isnan(init_direct) else init_direct
 
     def set_likelihood(self, last_pos: np.ndarray, map: Map, strength_weight_list: np.ndarray, subject_dist_list: np.ndarray) -> None:
         super().set_likelihood(map.beacon_pos_list, strength_weight_list, subject_dist_list)
