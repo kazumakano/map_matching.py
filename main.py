@@ -7,6 +7,7 @@ import script.parameter as param
 import script.utility as util
 from particle_filter.script.log import Log
 from particle_filter.script.resample import resample
+from particle_filter.script.truth import Truth
 from particle_filter.script.window import Window
 from script.map import Map
 from script.particle import Particle
@@ -26,6 +27,8 @@ def _set_main_params(conf: dict[str, Any]) -> None:
 
 def map_matching() -> None:
     log = Log(BEGIN, END, path.join(pf_param.ROOT_DIR, "log/observed/", LOG_FILE))
+    if pf_param.TRUTH_LOG_FILE is not None:
+        truth = Truth(BEGIN, END)
     map = Map(log.mac_list)
 
     if pf_param.ENABLE_DRAW_BEACONS:
@@ -55,6 +58,8 @@ def map_matching() -> None:
 
         poses, directs = resample(particles)
 
+        if pf_param.TRUTH_LOG_FILE is not None:
+            map.draw_truth_pos(truth.get_pos(t), True)
         if not pf_param.IS_LOST:
             map.draw_particles(estim_pos, particles)
             map.show()
