@@ -36,6 +36,7 @@ You can customize following parameters:
 |                      |                                                      |                                                                                                         |               |
 | dist_sd              | standard deviation of distance gap                   |                                                                                                         | `float`       |
 | el_correction        | correction term for difference in elevation          |                                                                                                         | `float`       |
+| estim_pos_policy     | policy to estimate subject's position                | 1: position of likeliest particle, 2: center of gravity of perticles                                    | `int`         |
 | neg_weight_coef      | coefficient for negative weight                      | not consider undetected beacons if 0                                                                    | `float`       |
 | propag_coef          | propagation coefficient                              | takes 2 in ideal environment                                                                            | `float`       |
 |                      |                                                      |                                                                                                         |               |
@@ -49,5 +50,3 @@ You can customize following parameters:
 |                      |                                                      |                                                                                                         |               |
 | match_weight_policy  | policy to calculate likelihood with map match weight | 1, 2: multiply match weight between nearest node and last linked node, last node 3: pass or cut off     | `int`         |
 | rand_pos_range       | range from last position at initialization [pixel]   | whole map if 0                                                                                          | `float`       |
-|                      |                                                      |                                                                                                         |               |
-| estim_pos_policy     | policy to estimate subject's position                | 1: position of likeliest particle, 2: center of gravity of perticles                                    | `int`         |

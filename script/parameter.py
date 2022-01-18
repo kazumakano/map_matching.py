@@ -19,11 +19,6 @@ def _set_particle_params(conf: dict[str, Any]) -> None:
     MATCH_WEIGHT_POLICY = np.int8(conf["match_weight_policy"])
     RAND_POS_RANGE = np.float16(conf["rand_pos_range"])
 
-def _set_util_params(conf: dict[str, Any]) -> None:
-    global ESTIM_POS_POLICY
-
-    ESTIM_POS_POLICY = np.int8(conf["estim_pos_policy"])
-
 def set_params(conf_file: Union[str, None] = None) -> dict[str, Any]:
     global ROOT_DIR
 
@@ -35,6 +30,5 @@ def set_params(conf_file: Union[str, None] = None) -> dict[str, Any]:
     conf = set_pf_params(conf_file)
     _set_map_params(conf)
     _set_particle_params(conf)
-    _set_util_params(conf)
 
     return conf

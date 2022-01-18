@@ -3,8 +3,8 @@ from datetime import datetime, timedelta
 from typing import Any
 import numpy as np
 import particle_filter.script.parameter as pf_param
+import particle_filter.script.utility as pf_util
 import script.parameter as param
-import script.utility as util
 from particle_filter.script.log import Log
 from particle_filter.script.resample import resample
 from particle_filter.script.truth import Truth
@@ -63,7 +63,7 @@ def map_matching() -> None:
         if not pf_param.IS_LOST:
             map.draw_particles(estim_pos, particles)
             map.show()
-            estim_pos = util.estim_pos(particles)
+            estim_pos = pf_util.estim_pos(particles)
         if pf_param.ENABLE_SAVE_VIDEO:
             map.record()
 
