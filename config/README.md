@@ -32,7 +32,7 @@ You can customize following parameters:
 |                      |                                                      |                                                                                                         |               |
 | lost_resample_policy | policy to resample particles when lost               | 1: reset, 2: use last particles                                                                         | `int`         |
 |                      |                                                      |                                                                                                         |               |
-| enable_truth         | enable ground truth or not                           |                                                                                                         | `bool`        |
+| truth_log_file       | ground truth position log file                       | disabled if unspecified                                                                                 | `str \| None` |
 |                      |                                                      |                                                                                                         |               |
 | dist_sd              | standard deviation of distance gap                   |                                                                                                         | `float`       |
 | el_correction        | correction term for difference in elevation          |                                                                                                         | `float`       |
