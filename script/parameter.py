@@ -14,10 +14,9 @@ def _set_map_params(conf: dict[str, Any]) -> None:
     SET_LINKS_POLICY = np.int8(conf["set_links_policy"])
 
 def _set_particle_params(conf: dict[str, Any]) -> None:
-    global MATCH_WEIGHT_POLICY, RAND_POS_RANGE
+    global MATCH_WEIGHT_POLICY
 
     MATCH_WEIGHT_POLICY = np.int8(conf["match_weight_policy"])
-    RAND_POS_RANGE = np.float16(conf["rand_pos_range"])
 
 def set_params(conf_file: Union[str, None] = None) -> dict[str, Any]:
     global ROOT_DIR

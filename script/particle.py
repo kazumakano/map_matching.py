@@ -7,17 +7,6 @@ from .map import Map
 
 
 class Particle(PfParticle):
-    def __init__(self, map_img_shape: tuple[int, int], last_pos: np.ndarray = np.full(2, np.nan, dtype=np.float16), init_pos: np.ndarray = np.full(2, np.nan, dtype=np.float16), init_direct: np.float16 = np.float16(np.nan)) -> None:
-        if np.isnan(init_pos[0]):
-            if param.RAND_POS_RANGE == 0 or np.isnan(last_pos[0]):
-                self.pos: np.ndarray = (map_img_shape * np.random.rand(2)).astype(np.float16)    # uniform distribution in map
-            else:
-                self.pos: np.ndarray = (last_pos - param.RAND_POS_RANGE / 2 + param.RAND_POS_RANGE * np.random.rand(2)).astype(np.float16)    # uniform distribution around last position
-        else:
-            self.pos = init_pos
-
-        self.direct = np.float16(360 * np.random.rand()) if np.isnan(init_direct) else init_direct
-
     def set_likelihood(self, last_pos: np.ndarray, map: Map, strength_weight_list: np.ndarray, subject_dist_list: np.ndarray) -> None:
         super().set_likelihood(map.beacon_pos_list, strength_weight_list, subject_dist_list)
 

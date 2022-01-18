@@ -29,6 +29,7 @@ You can customize following parameters:
 |                      |                                                      |                                                                                                         |               |
 | direct_sd            | standard deviation of direction at walk              |                                                                                                         | `float`       |
 | max_particle_stride  | maximum stride width of particles in a step [pixel]  |                                                                                                         | `float`       |
+| rand_pos_range       | range from last position at initialization [pixel]   | whole map if 0                                                                                          | `float`       |
 |                      |                                                      |                                                                                                         |               |
 | lost_resample_policy | policy to resample particles when lost               | 1: reset, 2: use last particles                                                                         | `int`         |
 |                      |                                                      |                                                                                                         |               |
@@ -49,4 +50,3 @@ You can customize following parameters:
 | set_links_policy     | policy to set links                                  | 1: load irregular from csv and search regular, 2: load all from CSV, 3: load all from pickle            | `int`         |
 |                      |                                                      |                                                                                                         |               |
 | match_weight_policy  | policy to calculate likelihood with map match weight | 1, 2: multiply match weight between nearest node and last linked node, last node 3: pass or cut off     | `int`         |
-| rand_pos_range       | range from last position at initialization [pixel]   | whole map if 0                                                                                          | `float`       |
