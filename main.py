@@ -14,7 +14,7 @@ from script.particle import Particle
 
 
 def _set_main_params(conf: dict[str, Any]) -> None:
-    global BEGIN, END, LOG_FILE, INIT_DIRECT, INIT_DIRECT_SD, INIT_POS, INIT_POS_SD, PARTICLE_NUM
+    global BEGIN, END, LOG_FILE, INIT_DIRECT, INIT_DIRECT_SD, INIT_POS, INIT_POS_SD, PARTICLE_NUM, RESULT_FILE_NAME
 
     BEGIN = datetime.strptime(conf["begin"], "%Y-%m-%d %H:%M:%S")
     END = datetime.strptime(conf["end"], "%Y-%m-%d %H:%M:%S")
@@ -24,12 +24,13 @@ def _set_main_params(conf: dict[str, Any]) -> None:
     INIT_POS = np.array(conf["init_pos"], dtype=np.float16)
     INIT_POS_SD = np.float16(conf["init_pos_sd"])
     PARTICLE_NUM = np.int16(conf["particle_num"])
+    RESULT_FILE_NAME = pf_util.gen_file_name() if conf["result_file_name"] is None else str(conf["result_file_name"])
 
 def map_matching() -> None:
     log = Log(BEGIN, END, path.join(pf_param.ROOT_DIR, "log/observed/", LOG_FILE))
     if pf_param.TRUTH_LOG_FILE is not None:
-        truth = Truth(BEGIN, END)
-    map = Map(log.mac_list)
+        truth = Truth(BEGIN, END, RESULT_FILE_NAME)
+    map = Map(log.mac_list, RESULT_FILE_NAME)
 
     if pf_param.ENABLE_DRAW_BEACONS:
         map.draw_beacons(True)
@@ -63,7 +64,7 @@ def map_matching() -> None:
             map.draw_particles(particles)
             map.show()
         if pf_param.TRUTH_LOG_FILE is not None:
-            map.draw_truth_pos(truth.get_pos(t), True)
+            map.draw_truth_pos(truth.calc_err(t, estim_pos, map.resolution), True)
             map.show()
         if pf_param.ENABLE_SAVE_VIDEO:
             map.record()
@@ -75,6 +76,8 @@ def map_matching() -> None:
         map.save_img()
     if pf_param.ENABLE_SAVE_VIDEO:
         map.save_video()
+    if pf_param.TRUTH_LOG_FILE is not None:
+        truth.plot_err()
     map.show(0)
 
 if __name__ == "__main__":

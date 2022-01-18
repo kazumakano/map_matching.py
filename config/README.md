@@ -13,6 +13,7 @@ You can customize following parameters:
 | init_pos             | initial position [pixel]                             |                                                                                                         | `list[float]` |
 | init_pos_sd          | standard deviation of position at initialization     |                                                                                                         | `float`       |
 | particle_num         | number of particles                                  |                                                                                                         | `int`         |
+| result_file_name     | file name of image and video                         | auto generated if unspecified                                                                           | `str \| None` |
 |                      |                                                      |                                                                                                         |               |
 | win_size             | size of sliding window [second]                      |                                                                                                         | `float`       |
 |                      |                                                      |                                                                                                         |               |
@@ -24,7 +25,6 @@ You can customize following parameters:
 | map_conf_file        | map config file                                      |                                                                                                         | `str`         |
 | map_img_file         | map image file                                       |                                                                                                         | `str`         |
 | map_show_policy      | policy to show particles and trajectory              | 1: all, 2: all & likeliest, 3: all & center, 4: likeliest, 5: center, 6: likeliest link, 7: center link | `int`         |
-| result_file_name     | file name of image and video                         | auto generated if unspecified                                                                           | `str \| None` |
 | win_stride           | stride width of sliding window [second]              |                                                                                                         | `float`       |
 |                      |                                                      |                                                                                                         |               |
 | direct_sd            | standard deviation of direction at walk              |                                                                                                         | `float`       |
