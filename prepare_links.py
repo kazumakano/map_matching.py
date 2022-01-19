@@ -2,8 +2,6 @@ import os.path as path
 from datetime import datetime
 from glob import glob
 import particle_filter.script.parameter as pf_param
-import particle_filter.script.utility as pf_util
-import script.parameter as param
 from particle_filter.script.log import Log
 from script.map import Map
 
@@ -21,6 +19,8 @@ def prepare_links(result_file_name: str, enable_csv: bool = False, enable_pkl: b
 
 if __name__ == "__main__":
     import argparse
+    import particle_filter.script.utility as pf_util
+    import script.parameter as param
     from script.parameter import set_params
 
     parser = argparse.ArgumentParser()

@@ -17,8 +17,8 @@ def _set_beacons(map: Map) -> None:
 
     print(f"visualize_nodes_and_links.py: {len(map.beacon_pos_list)} beacons found")
 
-def vis_map() -> None:
-    map = Map(Log(datetime(2000, 1, 1), datetime(2000, 1, 1), glob(path.join(pf_param.ROOT_DIR, "log/observed/*.csv"))[0]).mac_list)    # whatever is fine
+def vis_map(result_file_name: str) -> None:
+    map = Map(Log(datetime(2000, 1, 1), datetime(2000, 1, 1), glob(path.join(pf_param.ROOT_DIR, "log/observed/*.csv"))[0]).mac_list, result_file_name)    # whatever is fine
     if pf_param.ENABLE_DRAW_BEACONS:
         _set_beacons(map)
         map.draw_beacons()
@@ -33,6 +33,7 @@ def vis_map() -> None:
 
 if __name__ == "__main__":
     import argparse
+    import particle_filter.script.utility as pf_util
     from script.parameter import set_params
 
     parser = argparse.ArgumentParser()
@@ -46,10 +47,10 @@ if __name__ == "__main__":
     if (not args.beacon) and (not args.node) and (not args.link):
         raise Warning("visualize_map.py: set flags in order to visualize")
 
-    set_params(args.conf_file)
+    conf = set_params(args.conf_file)
     pf_param.ENABLE_DRAW_BEACONS = args.beacon
     param.ENABLE_DRAW_NODES = args.node
     param.ENABLE_DRAW_LINKS = args.link
     pf_param.ENABLE_SAVE_IMG = args.save
 
-    vis_map()
+    vis_map(pf_util.gen_file_name() if conf["result_file_name"] is None else str(conf["result_file_name"]))
