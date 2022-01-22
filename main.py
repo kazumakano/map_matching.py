@@ -61,7 +61,7 @@ def map_matching() -> None:
 
         if not pf_param.IS_LOST:
             estim_pos = pf_util.estim_pos(particles)
-            map.draw_particles(particles)
+            map.draw_particles(estim_pos, particles)
             map.show()
         if pf_param.TRUTH_LOG_FILE is not None:
             map.draw_truth_pos(truth.set_err(t, estim_pos, map.resolution, pf_param.IS_LOST), True)
