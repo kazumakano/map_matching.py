@@ -64,7 +64,7 @@ def map_matching() -> None:
             map.draw_particles(particles)
             map.show()
         if pf_param.TRUTH_LOG_FILE is not None:
-            map.draw_truth_pos(truth.calc_err(t, estim_pos, map.resolution), True)
+            map.draw_truth_pos(truth.set_err(t, estim_pos, map.resolution, pf_param.IS_LOST), True)
             map.show()
         if pf_param.ENABLE_SAVE_VIDEO:
             map.record()
