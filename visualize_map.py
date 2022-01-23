@@ -1,6 +1,7 @@
 import os.path as path
 from datetime import datetime
 from glob import glob, iglob
+from typing import Union
 import numpy as np
 import yaml
 import particle_filter.script.parameter as pf_param
@@ -17,8 +18,8 @@ def _set_beacons(map: Map) -> None:
 
     print(f"visualize_nodes_and_links.py: {len(map.beacon_pos_list)} beacons found")
 
-def vis_map(result_file_name: str) -> None:
-    map = Map(Log(datetime(2000, 1, 1), datetime(2000, 1, 1), glob(path.join(pf_param.ROOT_DIR, "log/observed/*.csv"))[0]).mac_list, result_file_name)    # whatever is fine
+def vis_map(result_dir: Union[str, None]) -> None:
+    map = Map(Log(datetime(2000, 1, 1), datetime(2000, 1, 1), glob(path.join(pf_param.ROOT_DIR, "log/observed/*.csv"))[0]).mac_list, result_dir)    # whatever is fine
     if pf_param.ENABLE_DRAW_BEACONS:
         _set_beacons(map)
         map.draw_beacons()
@@ -53,4 +54,4 @@ if __name__ == "__main__":
     param.ENABLE_DRAW_LINKS = args.link
     pf_param.ENABLE_SAVE_IMG = args.save
 
-    vis_map(pf_util.gen_file_name() if conf["result_file_name"] is None else str(conf["result_file_name"]))
+    vis_map(pf_util.make_result_dir(None if conf["result_dir_name"] is None else str(conf["result_dir_name"])))

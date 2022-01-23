@@ -2,7 +2,7 @@ import csv
 import os.path as path
 import pickle
 from itertools import combinations_with_replacement
-from typing import Any
+from typing import Any, Union
 import cv2
 import numpy as np
 import particle_filter.script.parameter as pf_param
@@ -14,7 +14,7 @@ from . import parameter as param
 
 
 class Map(PfMap):
-    def __init__(self, mac_list: np.ndarray, result_dir: str) -> None:
+    def __init__(self, mac_list: np.ndarray, result_dir: Union[str, None]) -> None:
         super().__init__(mac_list, result_dir)
 
         self._set_nodes()
