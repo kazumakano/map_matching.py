@@ -14,7 +14,7 @@ from script.particle import Particle
 
 
 def _set_main_params(conf: dict[str, Any]) -> None:
-    global BEGIN, END, LOG_FILE, INIT_DIRECT, INIT_DIRECT_SD, INIT_POS, INIT_POS_SD, PARTICLE_NUM, RESULT_FILE_NAME
+    global BEGIN, END, LOG_FILE, INIT_DIRECT, INIT_DIRECT_SD, INIT_POS, INIT_POS_SD, PARTICLE_NUM, RESULT_DIR_NAME
 
     BEGIN = datetime.strptime(conf["begin"], "%Y-%m-%d %H:%M:%S")
     END = datetime.strptime(conf["end"], "%Y-%m-%d %H:%M:%S")
@@ -24,13 +24,14 @@ def _set_main_params(conf: dict[str, Any]) -> None:
     INIT_POS = np.array(conf["init_pos"], dtype=np.float16)
     INIT_POS_SD = np.float16(conf["init_pos_sd"])
     PARTICLE_NUM = np.int16(conf["particle_num"])
-    RESULT_FILE_NAME = pf_util.gen_file_name() if conf["result_file_name"] is None else str(conf["result_file_name"])
+    RESULT_DIR_NAME = None if conf["result_dir_name"] is None else str(conf["result_dir_name"])
 
-def map_matching() -> None:
+def map_matching(conf: dict[str, Any]) -> None:
     log = Log(BEGIN, END, path.join(pf_param.ROOT_DIR, "log/observed/", LOG_FILE))
+    result_dir = pf_util.make_result_dir(RESULT_DIR_NAME)
+    map = Map(log.mac_list, result_dir)
     if pf_param.TRUTH_LOG_FILE is not None:
-        truth = Truth(BEGIN, END, RESULT_FILE_NAME)
-    map = Map(log.mac_list, RESULT_FILE_NAME)
+        truth = Truth(BEGIN, END, result_dir)
 
     if pf_param.ENABLE_DRAW_BEACONS:
         map.draw_beacons(True)
@@ -64,7 +65,7 @@ def map_matching() -> None:
             map.draw_particles(estim_pos, particles)
             map.show()
         if pf_param.TRUTH_LOG_FILE is not None:
-            map.draw_truth_pos(truth.set_err(t, estim_pos, map.resolution, pf_param.IS_LOST), True)
+            map.draw_truth_pos(truth.update_err_hist(t, estim_pos, map.resolution, pf_param.IS_LOST), True)
             map.show()
         if pf_param.ENABLE_SAVE_VIDEO:
             map.record()
@@ -76,8 +77,10 @@ def map_matching() -> None:
         map.save_img()
     if pf_param.ENABLE_SAVE_VIDEO:
         map.save_video()
+    if pf_param.ENABLE_WRITE_CONF:
+        pf_util.write_conf(conf, result_dir)
     if pf_param.TRUTH_LOG_FILE is not None:
-        truth.plot_err()
+        truth.export_err()
     map.show(0)
 
 if __name__ == "__main__":
@@ -87,6 +90,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-c", "--conf_file", help="specify config file", metavar="PATH_TO_CONF_FILE")
 
-    _set_main_params(set_params(parser.parse_args().conf_file))
+    conf = set_params(parser.parse_args().conf_file)
+    _set_main_params(conf)
 
-    map_matching()
+    map_matching(conf)

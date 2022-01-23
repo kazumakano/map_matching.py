@@ -14,8 +14,8 @@ from . import parameter as param
 
 
 class Map(PfMap):
-    def __init__(self, mac_list: np.ndarray, result_file_name: str) -> None:
-        super().__init__(mac_list, result_file_name)
+    def __init__(self, mac_list: np.ndarray, result_dir: str) -> None:
+        super().__init__(mac_list, result_dir)
 
         self._set_nodes()
         self._set_links()

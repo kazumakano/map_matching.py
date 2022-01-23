@@ -13,7 +13,7 @@ You can customize following parameters:
 | init_pos             | initial position [pixel]                             |                                                                                                         | `list[float]` |
 | init_pos_sd          | standard deviation of position at initialization     |                                                                                                         | `float`       |
 | particle_num         | number of particles                                  |                                                                                                         | `int`         |
-| result_file_name     | file name of image and video                         | auto generated if unspecified                                                                           | `str \| None` |
+| result_dir_name      | directory name for result files                      | auto generated if unspecified                                                                           | `str \| None` |
 |                      |                                                      |                                                                                                         |               |
 | win_size             | size of sliding window [second]                      |                                                                                                         | `float`       |
 |                      |                                                      |                                                                                                         |               |
@@ -37,6 +37,7 @@ You can customize following parameters:
 |                      |                                                      |                                                                                                         |               |
 | dist_sd              | standard deviation of distance gap                   |                                                                                                         | `float`       |
 | el_correction        | correction term for difference in elevation          |                                                                                                         | `float`       |
+| enable_write_conf    | write config file or not                             |                                                                                                         | `bool`        |
 | estim_pos_policy     | policy to estimate subject's position                | 1: position of likeliest particle, 2: center of gravity of perticles                                    | `int`         |
 | neg_weight_coef      | coefficient for negative weight                      | not consider undetected beacons if 0                                                                    | `float`       |
 | propag_coef          | propagation coefficient                              | takes 2 in ideal environment                                                                            | `float`       |

@@ -6,7 +6,7 @@ init_direct_sd: 45
 init_pos: [0, 0]
 init_pos_sd: 16
 particle_num: 256
-result_file_name:
+result_dir_name:
 
 win_size: 2
 
@@ -30,6 +30,7 @@ truth_log_file:
 
 dist_sd: 64
 el_correction: 2
+enable_write_conf: False
 estim_pos_policy: 1
 neg_weight_coef: 0
 propag_coef: 4
