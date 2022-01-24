@@ -49,6 +49,7 @@ def map_matching(conf: dict[str, Any]) -> None:
         directs[i] = np.float16(np.random.normal(loc=INIT_DIRECT, scale=INIT_DIRECT_SD) % 360)
     estim_pos = np.array(INIT_POS, dtype=np.float16)
 
+    lost_ts_hist = np.empty(0, dtype=datetime)
     t = BEGIN
     while t <= END:
         print("main.py:", t.time())
