@@ -46,7 +46,7 @@ You can customize following parameters:
 |                      |                                                      |                                                                                                         |               |
 | enable_draw_links    | draw links or not                                    |                                                                                                         | `bool`        |
 | enable_draw_nodes    | draw nodes or not                                    |                                                                                                         | `bool`        |
-| max_link_len         | maximum cost between 2 nodes to be linked            |                                                                                                         | `float`       |
+| max_link_len         | maximum cost between 2 nodes to be linked [pixel]    |                                                                                                         | `float`       |
 | nodes_show_policy    | policy to show nodes                                 | 1: circle, 2: node name                                                                                 | `int`         |
 | set_links_policy     | policy to set links                                  | 1: load irregular from csv and search regular, 2: load all from CSV, 3: load all from pickle            | `int`         |
 |                      |                                                      |                                                                                                         |               |
