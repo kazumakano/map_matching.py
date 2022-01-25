@@ -6,8 +6,8 @@ from particle_filter.script.log import Log
 from script.map import Map
 
 
-def prepare_links(result_file_name: str, enable_csv: bool = False, enable_pkl: bool = False) -> None:
-    map = Map(Log(datetime(2000, 1, 1), datetime(2000, 1, 1), glob(path.join(pf_param.ROOT_DIR, "log/observed/*.csv"))[0]).mac_list, result_file_name)    # whatever is fine
+def prepare_links(result_dir: str, enable_csv: bool = False, enable_pkl: bool = False) -> None:
+    map = Map(Log(datetime(2000, 1, 1), datetime(2000, 1, 1), glob(path.join(pf_param.ROOT_DIR, "log/observed/*.csv"))[0]).mac_list, result_dir)    # whatever is fine
 
     if enable_csv:
         map.export_links_to_csv()
@@ -34,6 +34,6 @@ if __name__ == "__main__":
 
     conf = set_params(args.conf_file)
     param.ENABLE_DRAW_LINKS = True
-    param.SET_LINKS_POLICY = 1
+    param.SET_NODES_LINKS_POLICY = 1
 
-    prepare_links(pf_util.gen_file_name() if conf["result_file_name"] is None else str(conf["result_file_name"]), args.csv, args.pkl)
+    prepare_links(pf_util.make_result_dir(None if conf["result_dir_name"] is None else str(conf["result_dir_name"])), args.csv, args.pkl)

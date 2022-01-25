@@ -20,16 +20,28 @@ class Map(PfMap):
         self._set_nodes()
         self._set_links()
 
+    def _gen_nodes(self) -> None:
+        self.node_poses = np.empty((0, 2), dtype=np.int16)
+        self.node_names = np.empty(0, dtype=object)    # any length string
+        for j in range(0, self.img.shape[0], 7):
+            for i in range(0, self.img.shape[1], 7):
+                if self.img[j, i, :].min() > 250:
+                    self.node_poses = np.vstack((self.node_poses, (i, j)))
+                    self.node_names = np.hstack((self.node_names, f"{i}-{j}"))
+
     def _set_nodes(self) -> None:
-        with open(path.join(param.ROOT_DIR, "map/node.yaml")) as f:
-            node_conf: dict[Any, list[int]] = yaml.safe_load(f)
-        self.node_poses = np.empty((len(node_conf), 2), dtype=np.int16)
-        self.node_names = np.empty(len(node_conf), dtype=object)    # any length string
-        i = 0
-        for k, v in node_conf.items():
-            self.node_poses[i] = v
-            self.node_names[i] = str(k)
-            i += 1
+        if param.SET_NODES_LINKS_POLICY in (1, 2, 3):
+            self._gen_nodes()            
+        # elif param.SET_NODES_LINKS_POLICY == 2:
+        #     with open(path.join(param.ROOT_DIR, "map/node.yaml")) as f:
+        #         node_conf: dict[Any, list[int]] = yaml.safe_load(f)
+        #     self.node_poses = np.empty((len(node_conf), 2), dtype=np.int16)
+        #     self.node_names = np.empty(len(node_conf), dtype=object)    # any length string
+        #     i = 0
+        #     for k, v in node_conf.items():
+        #         self.node_poses[i] = v
+        #         self.node_names[i] = str(k)
+        #         i += 1
 
         print(f"map.py: {len(self.node_poses)} nodes found")
 
@@ -105,14 +117,14 @@ class Map(PfMap):
     def _set_links(self) -> None:
         self._init_links()
 
-        if param.SET_LINKS_POLICY == 1:      # load some irregular and search regular
-            self._load_links("additional_link.csv")
+        if param.SET_NODES_LINKS_POLICY == 1:      # load some irregular and search regular
+            # self._load_links("additional_link.csv")
             self._get_direct_links_from_img()
             self._search_indirect_links()
-        elif param.SET_LINKS_POLICY == 2:    # load all from CSV file
+        elif param.SET_NODES_LINKS_POLICY == 2:    # load all from CSV file
             self._load_links("link.csv")
-        elif param.SET_LINKS_POLICY == 3:    # load all from pickle file
-            with open(path.join(param.ROOT_DIR, "map/link.pkl"), "rb") as f:
+        elif param.SET_NODES_LINKS_POLICY == 3:    # load all from pickle file
+            with open(path.join(param.ROOT_DIR, "map/link.pkl"), mode="rb") as f:
                 self.link_nodes, self.link_costs = pickle.load(f)
 
             print("map.py: link.pkl has been loaded")
@@ -160,7 +172,7 @@ class Map(PfMap):
             self._draw_link((0, 0, 255), self.get_nearest_node(last_pos), self.get_nearest_node(pf_util.get_center_of_gravity(particles)))
 
     def export_links_to_csv(self) -> None:
-        with open(path.join(param.ROOT_DIR, "map/link.csv"), "w") as f:
+        with open(path.join(param.ROOT_DIR, "map/link.csv"), mode="w", newline="") as f:
             writer = csv.writer(f)
             for i in range(len(self.node_poses)):
                 for index_ij, j in enumerate(self.link_nodes[i]):
@@ -169,7 +181,7 @@ class Map(PfMap):
         print("map.py: links have been exported to link.csv")
 
     def export_links_to_pkl(self) -> None:
-        with open(path.join(param.ROOT_DIR, "map/link.pkl"), "wb") as f:
+        with open(path.join(param.ROOT_DIR, "map/link.pkl"), mode="wb") as f:
             pickle.dump((self.link_nodes, self.link_costs), f)
 
         print("map.py: links have been exported to link.pkl")

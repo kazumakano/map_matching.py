@@ -5,13 +5,13 @@ from particle_filter.script.parameter import set_params as set_pf_params
 
 
 def _set_map_params(conf: dict[str, Any]) -> None:
-    global ENABLE_DRAW_LINKS, ENABLE_DRAW_NODES, MAX_LINK_LEN, NODES_SHOW_POLICY, SET_LINKS_POLICY
+    global ENABLE_DRAW_LINKS, ENABLE_DRAW_NODES, MAX_LINK_LEN, NODES_SHOW_POLICY, SET_NODES_LINKS_POLICY
     
     ENABLE_DRAW_LINKS = bool(conf["enable_draw_links"])
     ENABLE_DRAW_NODES = bool(conf["enable_draw_nodes"])
     MAX_LINK_LEN = np.float16(conf["max_link_len"])
     NODES_SHOW_POLICY = np.int8(conf["nodes_show_policy"])
-    SET_LINKS_POLICY = np.int8(conf["set_links_policy"])
+    SET_NODES_LINKS_POLICY = np.int8(conf["set_nodes_links_policy"])
 
 def _set_particle_params(conf: dict[str, Any]) -> None:
     global MATCH_WEIGHT_POLICY
