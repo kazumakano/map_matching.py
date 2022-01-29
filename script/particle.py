@@ -25,3 +25,7 @@ class Particle(PfParticle):
 
             elif param.MATCH_WEIGHT_POLICY == 3:    # pass or cut off
                 self.likelihood *= map.get_nearest_node(self.pos) in map.link_nodes[map.get_nearest_node(last_pos)]
+
+            elif param.MATCH_WEIGHT_POLICY == 4:    # half reduction
+                if map.get_nearest_node(self.pos) not in map.link_nodes[map.get_nearest_node(last_pos)]:
+                    self.likelihood *= 0.5

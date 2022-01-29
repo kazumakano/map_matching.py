@@ -20,34 +20,31 @@ class Map(PfMap):
         self._set_nodes()
         self._set_links()
 
-    def _gen_nodes(self) -> None:
-        self.node_poses = np.empty((0, 2), dtype=np.int16)
-        self.node_names = np.empty(0, dtype=object)    # any length string
-        for j in range(0, self.img.shape[0], 7):
-            for i in range(0, self.img.shape[1], 7):
-                if self.img[j, i, :].min() > 250:
-                    self.node_poses = np.vstack((self.node_poses, (i, j)))
-                    self.node_names = np.hstack((self.node_names, f"{i}-{j}"))
+    # def _gen_nodes(self) -> None:
+    #     self.node_poses = np.empty((0, 2), dtype=np.int16)
+    #     self.node_names = np.empty(0, dtype=object)    # any length string
+    #     for j in range(0, self.img.shape[0], 7):
+    #         for i in range(0, self.img.shape[1], 7):
+    #             if self.img[j, i, :].min() > 250:
+    #                 self.node_poses = np.vstack((self.node_poses, (i, j)))
+    #                 self.node_names = np.hstack((self.node_names, f"{i}-{j}"))
 
     def _set_nodes(self) -> None:
-        if param.SET_NODES_LINKS_POLICY in (1, 2, 3):
-            self._gen_nodes()            
-        # elif param.SET_NODES_LINKS_POLICY == 2:
-        #     with open(path.join(param.ROOT_DIR, "map/node.yaml")) as f:
-        #         node_conf: dict[Any, list[int]] = yaml.safe_load(f)
-        #     self.node_poses = np.empty((len(node_conf), 2), dtype=np.int16)
-        #     self.node_names = np.empty(len(node_conf), dtype=object)    # any length string
-        #     i = 0
-        #     for k, v in node_conf.items():
-        #         self.node_poses[i] = v
-        #         self.node_names[i] = str(k)
-        #         i += 1
+        with open(path.join(param.ROOT_DIR, "map/node.yaml")) as f:
+            node_conf: dict[Any, list[int]] = yaml.safe_load(f)
+        self.node_poses = np.empty((len(node_conf), 2), dtype=np.int16)
+        self.node_names = np.empty(len(node_conf), dtype=object)    # any length string
+        i = 0
+        for k, v in node_conf.items():
+            self.node_poses[i] = v
+            self.node_names[i] = str(k)
+            i += 1
 
         print(f"map.py: {len(self.node_poses)} nodes found")
 
     def _init_links(self) -> None:
         self.link_nodes = np.empty((len(self.node_poses)), dtype=np.ndarray)    # another node
-        self.link_costs = np.empty((len(self.node_poses)), dtype=np.ndarray)    # length of the link
+        self.link_costs = np.empty((len(self.node_poses)), dtype=np.ndarray)    # length [px]
         for i in range(len(self.node_poses)):
             self.link_nodes[i] = np.empty(0, dtype=np.int16)
             self.link_costs[i] = np.empty(0, dtype=np.float16)
@@ -59,8 +56,7 @@ class Map(PfMap):
             self.link_nodes[j] = np.hstack((self.link_nodes[j], i))
             self.link_costs[j] = np.hstack((self.link_costs[j], cost))
 
-    # load links from link file
-    def _load_links(self, link_file: str) -> None:
+    def _load_links_from_csv(self, link_file: str) -> None:
         with open(path.join(param.ROOT_DIR, "map/", link_file)) as f:
             reader = csv.reader(f)
             for row in reader:
@@ -71,12 +67,12 @@ class Map(PfMap):
                 except:
                     raise Warning(f"map.py: error occurred when loading {row}")
                 else:
-                    if j not in self.link_nodes[i] and cost < param.MAX_LINK_LEN:    # not to deplicate
+                    if j not in self.link_nodes[i] and cost <= param.MAX_LINK_LEN:    # not to deplicate
                         self._set_link_nodes_and_costs(i, j, cost)
 
         print(f"map.py: {link_file} has been loaded")
 
-    def _get_direct_links_from_img(self) -> None:
+    def _search_direct_links_from_img(self) -> None:
         for (i, p), (j, q) in combinations_with_replacement(enumerate(self.node_poses), 2):
             if j not in self.link_nodes[i]:
                 cost = pf_util.calc_dist_by_pos(p, q)
@@ -113,21 +109,34 @@ class Map(PfMap):
         for i in range(len(self.node_poses)):
             self._search_links_recursively(np.array((i,), dtype=np.int16), 0)
 
+    def _load_links_from_pkl(self) -> None:
+        with open(path.join(param.ROOT_DIR, "map/link.pkl"), mode="rb") as f:
+            self.link_nodes, self.link_costs = pickle.load(f)
+
+        print("map.py: link.pkl has been loaded")
+
+    def _check_link_costs(self) -> None:
+        for i in range(len(self.link_nodes)):
+            del_indexes = []
+            for index_ij, c in enumerate(self.link_costs[i]):
+                if c > param.MAX_LINK_LEN:
+                    del_indexes.append(index_ij)
+            self.link_nodes[i] = np.delete(self.link_nodes[i], del_indexes)
+            self.link_costs[i] = np.delete(self.link_costs[i], del_indexes)
+
     # prepare lookup table of links
     def _set_links(self) -> None:
         self._init_links()
 
         if param.SET_NODES_LINKS_POLICY == 1:      # load some irregular and search regular
-            # self._load_links("additional_link.csv")
-            self._get_direct_links_from_img()
+            self._load_links_from_csv("additional_link.csv")
+            self._search_direct_links_from_img()
             self._search_indirect_links()
         elif param.SET_NODES_LINKS_POLICY == 2:    # load all from CSV file
-            self._load_links("link.csv")
+            self._load_links_from_csv("link.csv")
         elif param.SET_NODES_LINKS_POLICY == 3:    # load all from pickle file
-            with open(path.join(param.ROOT_DIR, "map/link.pkl"), mode="rb") as f:
-                self.link_nodes, self.link_costs = pickle.load(f)
-
-            print("map.py: link.pkl has been loaded")
+            self._load_links_from_pkl()
+            self._check_link_costs()
 
     def _draw_link(self, color: tuple[int, int, int], i: int, j: int) -> None:
         cv2.line(self.img, self.node_poses[i], self.node_poses[j], color, 2)
@@ -174,8 +183,8 @@ class Map(PfMap):
     def export_links_to_csv(self) -> None:
         with open(path.join(param.ROOT_DIR, "map/link.csv"), mode="w", newline="") as f:
             writer = csv.writer(f)
-            for i in range(len(self.node_poses)):
-                for index_ij, j in enumerate(self.link_nodes[i]):
+            for i, js in enumerate(self.node_poses):
+                for index_ij, j in enumerate(js):
                     writer.writerow((self.node_names[i], self.node_names[j], self.link_costs[i][index_ij]))
 
         print("map.py: links have been exported to link.csv")
