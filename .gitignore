@@ -1,3 +1,4 @@
+*.ipynb
 config/*
 !config/README.md
 map/additional_link.csv
