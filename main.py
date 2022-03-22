@@ -19,10 +19,10 @@ def _set_main_params(conf: dict[str, Any]) -> None:
     BEGIN = datetime.strptime(conf["begin"], "%Y-%m-%d %H:%M:%S")
     END = datetime.strptime(conf["end"], "%Y-%m-%d %H:%M:%S")
     LOG_FILE = str(conf["log_file"])
-    INIT_DIRECT = np.float16(conf["init_direct"])
-    INIT_DIRECT_SD = np.float16(conf["init_direct_sd"])
-    INIT_POS = np.array(conf["init_pos"], dtype=np.float16)
-    INIT_POS_SD = np.float16(conf["init_pos_sd"])
+    INIT_DIRECT = np.float32(conf["init_direct"])
+    INIT_DIRECT_SD = np.float32(conf["init_direct_sd"])
+    INIT_POS = np.array(conf["init_pos"], dtype=np.float32)
+    INIT_POS_SD = np.float32(conf["init_pos_sd"])
     LOST_TJ_POLICY = np.int8(conf["lost_tj_policy"])
     PARTICLE_NUM = np.int16(conf["particle_num"])
     RESULT_DIR_NAME = None if conf["result_dir_name"] is None else str(conf["result_dir_name"])
@@ -36,19 +36,21 @@ def map_matching(conf: dict[str, Any], enable_show: bool = True) -> None:
 
     if pf_param.ENABLE_DRAW_BEACONS:
         map.draw_beacons(True)
+    if param.ENABLE_DRAW_LINKS:
+        map.draw_links(True)
     if param.ENABLE_DRAW_NODES:
         map.draw_nodes(True)
     if pf_param.ENABLE_SAVE_VIDEO:
         map.init_recorder()
 
     particles = np.empty(PARTICLE_NUM, dtype=Particle)
-    poses = np.empty((PARTICLE_NUM, 2), dtype=np.float16)
-    directs = np.empty(PARTICLE_NUM, dtype=np.float16)
+    poses = np.empty((PARTICLE_NUM, 2), dtype=np.float32)
+    directs = np.empty(PARTICLE_NUM, dtype=np.float32)
     for i in range(PARTICLE_NUM):
-        poses[i] = np.random.normal(loc=INIT_POS, scale=INIT_POS_SD, size=2).astype(np.float16)
-        directs[i] = np.float16(np.random.normal(loc=INIT_DIRECT, scale=INIT_DIRECT_SD) % 360)
+        poses[i] = np.random.normal(loc=INIT_POS, scale=INIT_POS_SD, size=2).astype(np.float32)
+        directs[i] = np.float32(np.random.normal(loc=INIT_DIRECT, scale=INIT_DIRECT_SD) % 360)
     
-    estim_pos = np.array(INIT_POS, dtype=np.float16)
+    estim_pos = np.array(INIT_POS, dtype=np.float32)
     lost_ts_buf = np.empty(0, dtype=datetime)
     t = BEGIN
     while t <= END:
@@ -80,7 +82,9 @@ def map_matching(conf: dict[str, Any], enable_show: bool = True) -> None:
                 if pf_param.TRUTH_LOG_FILE is not None:
                     buf_len = len(lost_ts_buf)
                     for i, lt in enumerate(lost_ts_buf):
-                        map.draw_truth(truth.update_err(lt, pf_util.get_lerped_pos(estim_pos, last_estim_pos, i, buf_len), map.resolution, True), True)
+                        lerped_pos = pf_util.get_lerped_pos(estim_pos, last_estim_pos, i, buf_len)
+                        map.draw_lerped_pos(lerped_pos, True)
+                        map.draw_truth(truth.update_err(lt, lerped_pos, map.resolution, True), True)
                     lost_ts_buf = np.empty(0, dtype=datetime)
                     map.draw_truth(truth.update_err(t, estim_pos, map.resolution, False), True)
 
