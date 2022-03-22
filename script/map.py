@@ -2,7 +2,7 @@ import csv
 import os.path as path
 import pickle
 from itertools import combinations_with_replacement
-from typing import Any, Union
+from typing import Any, Optional
 import cv2
 import numpy as np
 import particle_filter.script.parameter as pf_param
@@ -14,20 +14,11 @@ from . import parameter as param
 
 
 class Map(PfMap):
-    def __init__(self, mac_list: np.ndarray, result_dir: Union[str, None]) -> None:
+    def __init__(self, mac_list: np.ndarray, result_dir: Optional[str] = None) -> None:
         super().__init__(mac_list, result_dir)
 
         self._set_nodes()
         self._set_links()
-
-    # def _gen_nodes(self) -> None:
-    #     self.node_poses = np.empty((0, 2), dtype=np.int16)
-    #     self.node_names = np.empty(0, dtype=object)    # any length string
-    #     for j in range(0, self.img.shape[0], 7):
-    #         for i in range(0, self.img.shape[1], 7):
-    #             if self.img[j, i, :].min() > 250:
-    #                 self.node_poses = np.vstack((self.node_poses, (i, j)))
-    #                 self.node_names = np.hstack((self.node_names, f"{i}-{j}"))
 
     def _set_nodes(self) -> None:
         with open(path.join(param.ROOT_DIR, "map/node.yaml")) as f:
@@ -47,41 +38,36 @@ class Map(PfMap):
         self.link_costs = np.empty((len(self.node_poses)), dtype=np.ndarray)    # length [px]
         for i in range(len(self.node_poses)):
             self.link_nodes[i] = np.empty(0, dtype=np.int16)
-            self.link_costs[i] = np.empty(0, dtype=np.float16)
+            self.link_costs[i] = np.empty(0, dtype=np.float32)
 
-    def _set_link_nodes_and_costs(self, i: np.int16, j: np.int16, cost: np.float16) -> None:
+    def _set_link_nodes_and_costs(self, i: np.int16, j: np.int16, cost: np.float32) -> None:
         self.link_nodes[i] = np.hstack((self.link_nodes[i], j))
         self.link_costs[i] = np.hstack((self.link_costs[i], cost))
         if i != j:
             self.link_nodes[j] = np.hstack((self.link_nodes[j], i))
             self.link_costs[j] = np.hstack((self.link_costs[j], cost))
 
-    def _load_links_from_csv(self, link_file: str) -> None:
-        with open(path.join(param.ROOT_DIR, "map/", link_file)) as f:
-            reader = csv.reader(f)
-            for row in reader:
+    def _load_links_from_csv(self, file: str) -> None:
+        with open(path.join(param.ROOT_DIR, "map/", file)) as f:
+            for row in csv.reader(f):
                 try:
                     i = np.int16(np.where(row[0] == self.node_names)[0][0])
                     j = np.int16(np.where(row[1] == self.node_names)[0][0])
-                    cost = np.float16(row[2])
+                    cost = np.float32(row[2])
                 except:
                     raise Warning(f"map.py: error occurred when loading {row}")
                 else:
                     if j not in self.link_nodes[i] and cost <= param.MAX_LINK_LEN:    # not to deplicate
                         self._set_link_nodes_and_costs(i, j, cost)
 
-        print(f"map.py: {link_file} has been loaded")
+        print(f"map.py: {file} has been loaded")
 
     def _search_direct_links_from_img(self) -> None:
         for (i, p), (j, q) in combinations_with_replacement(enumerate(self.node_poses), 2):
             if j not in self.link_nodes[i]:
                 cost = pf_util.calc_dist_by_pos(p, q)
-
-                if cost < param.MAX_LINK_LEN:
-                    line_iterator = LineIterator(self.plain_img, p, q)
-
-                    if line_iterator.min() > 250:    # if link is on white region
-                        self._set_link_nodes_and_costs(i, j, cost)
+                if cost <= param.MAX_LINK_LEN and LineIterator(self.plain_img, p, q).min() > 250:    # link is on white region
+                    self._set_link_nodes_and_costs(i, j, cost)
 
     def _update_link_nodes_and_costs(self, i: np.int16, j: np.int16, cost: np.float16) -> None:
         if j not in self.link_nodes[i]:
@@ -92,7 +78,7 @@ class Map(PfMap):
                 self.link_costs[i][index_ij] = cost    # update cost
                 self.link_costs[j][np.where(i == self.link_nodes[j])[0][0]] = cost
 
-    def _search_links_recursively(self, node_indexes: np.ndarray, cost: np.float16) -> None:
+    def _search_links_recursively(self, node_indexes: np.ndarray, cost: np.float32) -> None:
         i: np.int16 = node_indexes[0]     # root
         j: np.int16 = node_indexes[-1]    # leaf
 
@@ -100,8 +86,8 @@ class Map(PfMap):
             if k in node_indexes:
                 continue
 
-            cost_sum: np.float16 = cost + self.link_costs[j][index_jk]
-            if cost_sum < param.MAX_LINK_LEN:
+            cost_sum: np.float32 = cost + self.link_costs[j][index_jk]
+            if cost_sum <= param.MAX_LINK_LEN:
                 self._update_link_nodes_and_costs(i, k, cost_sum)
                 self._search_links_recursively(np.hstack((node_indexes, k)), cost_sum)
 
@@ -109,11 +95,11 @@ class Map(PfMap):
         for i in range(len(self.node_poses)):
             self._search_links_recursively(np.array((i,), dtype=np.int16), 0)
 
-    def _load_links_from_pkl(self) -> None:
-        with open(path.join(param.ROOT_DIR, "map/link.pkl"), mode="rb") as f:
+    def _load_links_from_pkl(self, file: str) -> None:
+        with open(path.join(param.ROOT_DIR, "map/", file), mode="rb") as f:
             self.link_nodes, self.link_costs = pickle.load(f)
 
-        print("map.py: link.pkl has been loaded")
+        print(f"map.py: {file} has been loaded")
 
     def _check_link_costs(self) -> None:
         for i in range(len(self.link_nodes)):
@@ -135,19 +121,21 @@ class Map(PfMap):
         elif param.SET_NODES_LINKS_POLICY == 2:    # load all from CSV file
             self._load_links_from_csv("link.csv")
         elif param.SET_NODES_LINKS_POLICY == 3:    # load all from pickle file
-            self._load_links_from_pkl()
+            self._load_links_from_pkl("link.pkl")
             self._check_link_costs()
 
-    def _draw_link(self, color: tuple[int, int, int], i: int, j: int) -> None:
-        cv2.line(self.img, self.node_poses[i], self.node_poses[j], color, 2)
+    def _draw_line(self, color: tuple[int, int, int], i: int, j: int, is_never_cleared: bool) -> None:
+        if is_never_cleared:
+            cv2.line(self.plain_img, self.node_poses[i], self.node_poses[j], color, thickness=2)
+        cv2.line(self.img, self.node_poses[i], self.node_poses[j], color, thickness=2)
 
-    def draw_links(self) -> None:
+    def draw_links(self, is_never_cleared: bool = False) -> None:
         if not param.ENABLE_DRAW_LINKS:
             raise Warning("map.py: drawing links is not enabled but draw_links() was called")
 
         for i, js in enumerate(self.link_nodes):
             for j in js:
-                self._draw_link((128, 128, 128), i, j)
+                self._draw_line((128, 128, 128), i, j, is_never_cleared)
 
     def draw_nodes(self, is_never_cleared: bool = False) -> None:
         if not param.ENABLE_DRAW_NODES:
@@ -158,8 +146,8 @@ class Map(PfMap):
                 self._draw_pos((128, 128, 128), is_never_cleared, p)
             elif param.NODES_SHOW_POLICY == 2:    # node name
                 if is_never_cleared:
-                    cv2.putText(self.plain_img, self.node_names[i], p, cv2.FONT_HERSHEY_PLAIN, 1, (128, 128, 128), 2, cv2.LINE_AA)
-                cv2.putText(self.img, self.node_names[i], p, cv2.FONT_HERSHEY_PLAIN, 1, (128, 128, 128), 2, cv2.LINE_AA)
+                    cv2.putText(self.plain_img, self.node_names[i], p, cv2.FONT_HERSHEY_PLAIN, 1, (128, 128, 128), thickness=2, lineType=cv2.LINE_AA)
+                cv2.putText(self.img, self.node_names[i], p, cv2.FONT_HERSHEY_PLAIN, 1, (128, 128, 128), thickness=2, linetype=cv2.LINE_AA)
 
     def get_nearest_node(self, pos: np.ndarray) -> int:
         min_dist = np.inf
@@ -176,9 +164,9 @@ class Map(PfMap):
         super().draw_particles(particles)
 
         if pf_param.SHOW_POLICY == 6:
-            self._draw_link((0, 0, 255), self.get_nearest_node(last_pos), self.get_nearest_node(pf_util.get_likeliest_particle(particles).pos))
+            self._draw_line((0, 0, 255), self.get_nearest_node(last_pos), self.get_nearest_node(pf_util.get_likeliest_particle(particles).pos))
         elif pf_param.SHOW_POLICY == 7:
-            self._draw_link((0, 0, 255), self.get_nearest_node(last_pos), self.get_nearest_node(pf_util.get_center_of_gravity(particles)))
+            self._draw_line((0, 0, 255), self.get_nearest_node(last_pos), self.get_nearest_node(pf_util.get_center_of_gravity(particles)))
 
     def export_links_to_csv(self) -> None:
         with open(path.join(param.ROOT_DIR, "map/link.csv"), mode="w", newline="") as f:
@@ -195,5 +183,5 @@ class Map(PfMap):
 
         print("map.py: links have been exported to link.pkl")
 
-    def get_cost(self, i: int, j: int) -> np.float64:
-        return self.link_costs[i][np.where(j == self.link_nodes[i])[0][0]] if j in self.link_nodes[i] else np.inf
+    def get_cost(self, i: int, j: int) -> np.float32:
+        return self.link_costs[i][np.where(j == self.link_nodes[i])[0][0]] if j in self.link_nodes[i] else np.float32(np.inf)
