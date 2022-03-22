@@ -1,27 +1,14 @@
-import os.path as path
-from datetime import datetime
-from glob import glob, iglob
-from typing import Any, Union
+from typing import Optional
 import numpy as np
-import yaml
 import particle_filter.script.parameter as pf_param
 import script.parameter as param
-from particle_filter.script.log import Log
 from script.map import Map
 
 
-def _set_beacons(map: Map) -> None:
-    for beacon_file in iglob(path.join(pf_param.ROOT_DIR, "map/beacon/*.yaml")):
-        with open(beacon_file) as f:
-            beacon_conf: dict[str, Any] = yaml.safe_load(f)
-        map.beacon_pos_list = np.vstack((map.beacon_pos_list, beacon_conf["rotated_position"][0:2]))
-
-    print(f"visualize_nodes_and_links.py: {len(map.beacon_pos_list)} beacons were found")
-
-def vis_map(result_dir: Union[str, None], enable_show: bool = True) -> None:
-    map = Map(Log(datetime(2000, 1, 1), datetime(2000, 1, 1), glob(path.join(pf_param.ROOT_DIR, "log/observed/*.csv"))[0]).mac_list, result_dir)    # whatever is fine
+def vis_map(result_dir: Optional[str], enable_show: bool = True) -> None:
+    map = Map(np.empty(0, dtype=str), result_dir)
     if pf_param.ENABLE_DRAW_BEACONS:
-        _set_beacons(map)
+        map.set_all_beacons()
         map.draw_beacons()
     if param.ENABLE_DRAW_NODES:
         map.draw_nodes()
@@ -41,8 +28,8 @@ if __name__ == "__main__":
     parser.add_argument("-c", "--conf_file", help="specify config file", metavar="PATH_TO_CONF_FILE")
     parser.add_argument("--no_display", action="store_true", help="run without display")
     parser.add_argument("-b", "--beacon", action="store_true", help="enable draw beacons")
-    parser.add_argument("-n", "--node", action="store_true", help="enable draw nodes")
     parser.add_argument("-l", "--link", action="store_true", help="enable draw links")
+    parser.add_argument("-n", "--node", action="store_true", help="enable draw nodes")
     parser.add_argument("-s", "--save", action="store_true", help="enable save image")
     args = parser.parse_args()
 
@@ -51,8 +38,8 @@ if __name__ == "__main__":
 
     conf = set_params(args.conf_file)
     pf_param.ENABLE_DRAW_BEACONS = args.beacon
-    param.ENABLE_DRAW_NODES = args.node
     param.ENABLE_DRAW_LINKS = args.link
+    param.ENABLE_DRAW_NODES = args.node
     pf_param.ENABLE_SAVE_IMG = args.save
 
     vis_map(pf_util.make_result_dir(None if conf["result_dir_name"] is None else str(conf["result_dir_name"])), not args.no_display)
