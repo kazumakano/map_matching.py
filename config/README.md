@@ -17,6 +17,7 @@ You can customize following parameters:
 |                        |                                                       |                                                                                                         |               |
 | win_size               | size of sliding window [s]                            |                                                                                                         | `float`       |
 |                        |                                                       |                                                                                                         |               |
+| beacon_dir             | directory for beacon config files                     |                                                                                                         | `str`         |
 | enable_clear_map       | clear map image at each step or not                   |                                                                                                         | `bool`        |
 | enable_draw_beacons    | draw beacon positions or not                          |                                                                                                         | `bool`        |
 | enable_save_img        | capture image at last or not                          |                                                                                                         | `bool`        |
