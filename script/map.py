@@ -171,7 +171,7 @@ class Map(PfMap):
     def export_links_to_csv(self) -> None:
         with open(path.join(param.ROOT_DIR, "map/link.csv"), mode="w", newline="") as f:
             writer = csv.writer(f)
-            for i, js in enumerate(self.node_poses):
+            for i, js in enumerate(self.link_nodes):
                 for index_ij, j in enumerate(js):
                     writer.writerow((self.node_names[i], self.node_names[j], self.link_costs[i][index_ij]))
 
