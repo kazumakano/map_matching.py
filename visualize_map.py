@@ -33,7 +33,7 @@ if __name__ == "__main__":
     parser.add_argument("-s", "--save", action="store_true", help="enable save image")
     args = parser.parse_args()
 
-    if (not args.beacon) and (not args.node) and (not args.link):
+    if (not args.beacon) and (not args.link) and (not args.node):
         raise Warning("visualize_map.py: set flags in order to visualize")
 
     conf = set_params(args.conf_file)
