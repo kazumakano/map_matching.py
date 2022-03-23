@@ -28,11 +28,11 @@ def create_network_figure(result_file_name: Optional[str] = None) -> None:
     ax.legend(fontsize=8, frameon=False, loc="upper left")
     ax.tick_params(color="gray", length=2, width=0.8)
     ax.set_xlabel("Location [m]")
-    ax.set_xticks(ticks=range(0, 1126, 125), labels=range(0, 91, 10), fontsize=8)
-    ax.set_xticks(ticks=np.arange(0, 1126, 62.5))
+    plt.xticks(ticks=range(1425, 299, -125), labels=range(0, 91, 10), fontsize=8)
+    plt.xticks(ticks=np.arange(1425, 299, -62.5))
     ax.set_ylabel("Location [m]")
-    ax.set_yticks(ticks=range(0, 751, 125), labels=range(0, 61, 10), fontsize=8)
-    ax.set_yticks(ticks=np.arange(0, 751, 62.5))
+    plt.yticks(ticks=range(1550, 799, -125), labels=range(0, 61, 10), fontsize=8)
+    plt.yticks(ticks=np.arange(1550, 799, -62.5))
 
     if result_file_name is not None:
         plt.savefig(path.join(pf_param.ROOT_DIR, "result/", result_file_name + ".eps"))
