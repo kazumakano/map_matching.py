@@ -146,8 +146,8 @@ class Map(PfMap):
                 self._draw_pos((128, 128, 128), is_never_cleared, p)
             elif param.NODES_SHOW_POLICY == 2:    # node name
                 if is_never_cleared:
-                    cv2.putText(self.plain_img, self.node_names[i], p, cv2.FONT_HERSHEY_PLAIN, 1, (128, 128, 128), thickness=2, lineType=cv2.LINE_AA)
-                cv2.putText(self.img, self.node_names[i], p, cv2.FONT_HERSHEY_PLAIN, 1, (128, 128, 128), thickness=2, linetype=cv2.LINE_AA)
+                    cv2.putText(self.plain_img, self.node_names[i], p, cv2.FONT_HERSHEY_PLAIN, 0.5, (128, 128, 128), lineType=cv2.LINE_AA)
+                cv2.putText(self.img, self.node_names[i], p, cv2.FONT_HERSHEY_PLAIN, 0.5, (128, 128, 128), lineType=cv2.LINE_AA)
 
     def get_nearest_node(self, pos: np.ndarray) -> int:
         min_dist = np.inf

@@ -33,5 +33,5 @@ Set `--no_display` flag to run without showing map.
 Set `--beacon` flag, `--link` flag, and `--node` flag to visualize them.
 Set `--save` flag to save image.
 ```sh
-python visualize_map.py [--conf_file PATH_TO_CONF_FILE] [--no_display] [--beacon] [--link] [--node] [--save]
+python visualize_map.py [--conf_file PATH_TO_CONF_FILE] [--no_display] [--beacon] [--link] [--node NODES_SHOW_POLICY] [--save]
 ```

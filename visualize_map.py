@@ -29,7 +29,7 @@ if __name__ == "__main__":
     parser.add_argument("--no_display", action="store_true", help="run without display")
     parser.add_argument("-b", "--beacon", action="store_true", help="enable draw beacons")
     parser.add_argument("-l", "--link", action="store_true", help="enable draw links")
-    parser.add_argument("-n", "--node", action="store_true", help="enable draw nodes")
+    parser.add_argument("-n", "--node", default=-1, type=int, choices=(1, 2), help="enable draw nodes", metavar="NODES_SHOW_POLICY")
     parser.add_argument("-s", "--save", action="store_true", help="enable save image")
     args = parser.parse_args()
 
@@ -37,9 +37,10 @@ if __name__ == "__main__":
         raise Warning("visualize_map.py: set flags in order to visualize")
 
     conf = set_params(args.conf_file)
-    pf_param.ENABLE_DRAW_BEACONS = args.beacon
-    param.ENABLE_DRAW_LINKS = args.link
-    param.ENABLE_DRAW_NODES = args.node
-    pf_param.ENABLE_SAVE_IMG = args.save
+    pf_param.ENABLE_DRAW_BEACONS = bool(args.beacon)
+    param.ENABLE_DRAW_LINKS = bool(args.link)
+    param.ENABLE_DRAW_NODES = bool(args.node != -1)
+    param.NODES_SHOW_POLICY = int(args.node)
+    pf_param.ENABLE_SAVE_IMG = bool(args.save)
 
     vis_map(pf_util.make_result_dir(None if conf["result_dir_name"] is None else str(conf["result_dir_name"])), not args.no_display)
