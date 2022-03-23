@@ -2,7 +2,7 @@ import numpy as np
 from script.map import Map
 
 
-def prepare_links(enable_show: bool = True, enable_csv: bool = False, enable_pkl: bool = False) -> None:
+def prepare_links(enable_csv: bool = False, enable_pkl: bool = False, enable_show: bool = True) -> None:
     map = Map(np.empty(0, dtype=str))
 
     if enable_csv:
@@ -35,4 +35,4 @@ if __name__ == "__main__":
     param.ENABLE_DRAW_NODES = True
     param.SET_NODES_LINKS_POLICY = 1
 
-    prepare_links(not args.no_display, args.csv, args.pkl)
+    prepare_links(args.csv, args.pkl, not args.no_display)
