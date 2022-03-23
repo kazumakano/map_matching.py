@@ -30,8 +30,8 @@ You can visualize map with following command.
 You can specify config file with `--conf_file` flag.
 `config/default.yaml` will be used if unspecified.
 Set `--no_display` flag to run without showing map.
-Set `--beacon` flag, `--node` flag, and `--link` flag to visualize them.
+Set `--beacon` flag, `--link` flag, and `--node` flag to visualize them.
 Set `--save` flag to save image.
 ```sh
-python visualize_map.py [--conf_file PATH_TO_CONF_FILE] [--no_display] [--beacon] [--node] [--link] [--save]
+python visualize_map.py [--conf_file PATH_TO_CONF_FILE] [--no_display] [--beacon] [--link] [--node] [--save]
 ```
