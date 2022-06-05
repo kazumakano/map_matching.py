@@ -166,10 +166,11 @@ class Map(PfMap):
     def draw_particles(self, last_pos: np.ndarray, particles: np.ndarray) -> None:
         super().draw_particles(particles)
 
-        if pf_param.SHOW_POLICY == 6:
-            self._draw_line((0, 0, 255), self.get_nearest_node(last_pos), self.get_nearest_node(pf_util.get_likeliest_particle(particles).pos))
-        elif pf_param.SHOW_POLICY == 7:
-            self._draw_line((0, 0, 255), self.get_nearest_node(last_pos), self.get_nearest_node(pf_util.get_center_of_gravity(particles)))
+        match pf_param.SHOW_POLICY:
+            case 6:
+                self._draw_line((0, 0, 255), self.get_nearest_node(last_pos), self.get_nearest_node(pf_util.get_likeliest_particle(particles).pos))
+            case 7:
+                self._draw_line((0, 0, 255), self.get_nearest_node(last_pos), self.get_nearest_node(pf_util.get_center_of_gravity(particles)))
 
     def export_links_to_csv(self) -> None:
         with open(path.join(param.ROOT_DIR, "map/link.csv"), mode="w", newline="") as f:
