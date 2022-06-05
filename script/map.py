@@ -71,27 +71,28 @@ class Map(PfMap):
         if j not in self.link_nodes[i]:
             self._set_link_nodes_and_costs(i, j, cost)    # set nodes and costs
         else:
-            index_ij: int = np.where(j == self.link_nodes[i])[0][0]
+            index_ij = np.where(j == self.link_nodes[i])[0][0]
             if cost < self.link_costs[i][index_ij]:
                 self.link_costs[i][index_ij] = cost    # update cost
                 self.link_costs[j][np.where(i == self.link_nodes[j])[0][0]] = cost
 
-    def _search_links_recursively(self, node_indexes: np.ndarray, cost: np.float32) -> None:
-        i: np.int16 = node_indexes[0]     # root
-        j: np.int16 = node_indexes[-1]    # leaf
+    def _search_links_recursively(self, node_indexes: list[int], cost: np.float32) -> None:
+        i = node_indexes[0]     # root
+        j = node_indexes[-1]    # leaf
 
         for index_jk, k in enumerate(self.link_nodes[j]):
             if k in node_indexes:
                 continue
 
-            cost_sum: np.float32 = cost + self.link_costs[j][index_jk]
+            cost_sum = cost + self.link_costs[j][index_jk]
             if cost_sum <= param.MAX_LINK_LEN:
                 self._update_link_nodes_and_costs(i, k, cost_sum)
-                self._search_links_recursively(np.hstack((node_indexes, k)), cost_sum)
+                node_indexes.append(k)
+                self._search_links_recursively(node_indexes, cost_sum)
 
     def _search_indirect_links(self) -> None:
         for i in range(len(self.node_poses)):
-            self._search_links_recursively(np.array((i,), dtype=np.int16), 0)
+            self._search_links_recursively([i], 0)
 
     def _load_links_from_pkl(self, file: str) -> None:
         with open(path.join(param.ROOT_DIR, "map/", file), mode="rb") as f:
