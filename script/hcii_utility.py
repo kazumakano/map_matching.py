@@ -34,7 +34,7 @@ def create_network_figure(result_file_name: Optional[str] = None) -> None:
     plt.yticks(ticks=np.arange(1550, 799, -62.5))
 
     if result_file_name is not None:
-        plt.savefig(path.join(pf_param.ROOT_DIR, "result/", result_file_name + ".eps"))
+        plt.savefig(path.join(pf_param.ROOT_DIR, "result/", result_file_name + ".pdf"))
         plt.savefig(path.join(pf_param.ROOT_DIR, "result/", result_file_name + ".png"))
     plt.show()
     plt.close()
