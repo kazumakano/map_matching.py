@@ -10,7 +10,6 @@ from .map import Map
 
 def create_network_figure(result_file_name: Optional[str] = None) -> None:
     map = Map(np.empty(0, dtype=str))
-    map.set_all_beacons()
     link_segs = np.empty((0, 2, 2), dtype=np.int16)
     for i, js in enumerate(map.link_nodes):
         for j in js:
