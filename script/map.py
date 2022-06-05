@@ -49,8 +49,8 @@ class Map(PfMap):
         with open(path.join(param.ROOT_DIR, "map/", file)) as f:
             for row in csv.reader(f):
                 try:
-                    i = np.int16(np.where(row[0] == self.node_names)[0][0])
-                    j = np.int16(np.where(row[1] == self.node_names)[0][0])
+                    i = np.where(row[0] == self.node_names)[0][0]
+                    j = np.where(row[1] == self.node_names)[0][0]
                     cost = np.float32(row[2])
                 except:
                     raise Warning(f"map.py: error occurred when loading {row}")
@@ -112,15 +112,16 @@ class Map(PfMap):
     def _set_links(self) -> None:
         self._init_links()
 
-        if param.SET_NODES_LINKS_POLICY == 1:      # load some irregular and search regular
-            self._load_links_from_csv("additional_link.csv")
-            self._search_direct_links_from_img()
-            self._search_indirect_links()
-        elif param.SET_NODES_LINKS_POLICY == 2:    # load all from CSV file
-            self._load_links_from_csv("link.csv")
-        elif param.SET_NODES_LINKS_POLICY == 3:    # load all from pickle file
-            self._load_links_from_pkl("link.pkl")
-            self._check_link_costs()
+        match param.SET_NODES_LINKS_POLICY:
+            case 1:    # load some irregular and search regular
+                self._load_links_from_csv("additional_link.csv")
+                self._search_direct_links_from_img()
+                self._search_indirect_links()
+            case 2:    # load all from CSV file
+                self._load_links_from_csv("link.csv")
+            case 3:    # load all from pickle file
+                self._load_links_from_pkl("link.pkl")
+                self._check_link_costs()
 
     def _draw_line(self, color: tuple[int, int, int], i: int, j: int, is_never_cleared: bool) -> None:
         if is_never_cleared:
