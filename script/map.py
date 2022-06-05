@@ -24,14 +24,12 @@ class Map(PfMap):
         with open(path.join(param.ROOT_DIR, "map/node.yaml")) as f:
             node_conf: dict[Any, list[int]] = yaml.safe_load(f)
         self.node_poses = np.empty((len(node_conf), 2), dtype=np.int16)
-        self.node_names = np.empty(len(node_conf), dtype=object)    # any length string
-        i = 0
-        for k, v in node_conf.items():
+        self.node_names = np.empty(len(node_conf), dtype=np.object_)    # any length string
+        for i, (k, v) in enumerate(node_conf.items()):
             self.node_poses[i] = v
             self.node_names[i] = str(k)
-            i += 1
 
-        print(f"map.py: {len(self.node_poses)} nodes found")
+        print(f"map.py: {len(self.node_poses)} nodes were found")
 
     def _init_links(self) -> None:
         self.link_nodes = np.empty((len(self.node_poses)), dtype=np.ndarray)    # another node
@@ -143,7 +141,7 @@ class Map(PfMap):
 
         for i, p in enumerate(self.node_poses):
             if param.NODES_SHOW_POLICY == 1:      # circle
-                self._draw_pos((128, 128, 128), is_never_cleared, p)
+                self._safe_draw_pos((128, 128, 128), is_never_cleared, p)
             elif param.NODES_SHOW_POLICY == 2:    # node name
                 if is_never_cleared:
                     cv2.putText(self.plain_img, self.node_names[i], p, cv2.FONT_HERSHEY_PLAIN, 0.5, (128, 128, 128), lineType=cv2.LINE_AA)
