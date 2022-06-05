@@ -47,11 +47,11 @@ def map_matching(conf: dict[str, Any], enable_show: bool = True) -> None:
     poses = np.empty((PARTICLE_NUM, 2), dtype=np.float32)
     directs = np.empty(PARTICLE_NUM, dtype=np.float32)
     for i in range(PARTICLE_NUM):
-        poses[i] = np.random.normal(loc=INIT_POS, scale=INIT_POS_SD, size=2).astype(np.float32)
-        directs[i] = np.float32(np.random.normal(loc=INIT_DIRECT, scale=INIT_DIRECT_SD) % 360)
+        poses[i] = np.random.normal(loc=INIT_POS, scale=INIT_POS_SD, size=2)
+        directs[i] = np.random.normal(loc=INIT_DIRECT, scale=INIT_DIRECT_SD) % 360
     
     estim_pos = np.array(INIT_POS, dtype=np.float32)
-    lost_ts_buf = np.empty(0, dtype=datetime)
+    lost_ts_buf = []
     t = BEGIN
     while t <= END:
         print(f"main.py: {t.time()}")
@@ -64,29 +64,30 @@ def map_matching(conf: dict[str, Any], enable_show: bool = True) -> None:
 
         poses, directs = resample(particles)
 
-        if LOST_TJ_POLICY == 1:
-            if not pf_param.IS_LOST:
-                estim_pos = pf_util.estim_pos(particles)
-                map.draw_particles(estim_pos, particles)
-            if pf_param.TRUTH_LOG_FILE is not None:
-                map.draw_truth(truth.update_err(t, estim_pos, map.resolution, pf_param.IS_LOST), True)
-
-        elif LOST_TJ_POLICY == 2:
-            if pf_param.TRUTH_LOG_FILE is not None and pf_param.IS_LOST:
-                last_estim_pos = estim_pos
-                lost_ts_buf = np.hstack((lost_ts_buf, t))
-            elif not pf_param.IS_LOST:
-                estim_pos = pf_util.estim_pos(particles)
-                map.draw_particles(estim_pos, particles)
-
+        match LOST_TJ_POLICY:
+            case 1:
+                if not pf_param.IS_LOST:
+                    estim_pos = pf_util.estim_pos(particles)
+                    map.draw_particles(estim_pos, particles)
                 if pf_param.TRUTH_LOG_FILE is not None:
-                    buf_len = len(lost_ts_buf)
-                    for i, lt in enumerate(lost_ts_buf):
-                        lerped_pos = pf_util.get_lerped_pos(estim_pos, last_estim_pos, i, buf_len)
-                        map.draw_lerped_pos(lerped_pos, True)
-                        map.draw_truth(truth.update_err(lt, lerped_pos, map.resolution, True), True)
-                    lost_ts_buf = np.empty(0, dtype=datetime)
-                    map.draw_truth(truth.update_err(t, estim_pos, map.resolution, False), True)
+                    map.draw_truth(truth.update_err(t, estim_pos, map.resolution, pf_param.IS_LOST), True)
+
+            case 2:
+                if pf_param.TRUTH_LOG_FILE is not None and pf_param.IS_LOST:
+                    last_estim_pos = estim_pos
+                    lost_ts_buf.append(t)
+                elif not pf_param.IS_LOST:
+                    estim_pos = pf_util.estim_pos(particles)
+                    map.draw_particles(estim_pos, particles)
+
+                    if pf_param.TRUTH_LOG_FILE is not None:
+                        buf_len = len(lost_ts_buf)
+                        for i, lt in enumerate(lost_ts_buf):
+                            lerped_pos = pf_util.get_lerped_pos(estim_pos, last_estim_pos, i, buf_len)
+                            map.draw_lerped_pos(lerped_pos, True)
+                            map.draw_truth(truth.update_err(lt, lerped_pos, map.resolution, True), True)
+                        lost_ts_buf.clear()
+                        map.draw_truth(truth.update_err(t, estim_pos, map.resolution, False), True)
 
         if pf_param.ENABLE_SAVE_VIDEO:
             map.record()
