@@ -72,24 +72,24 @@ class Map(PfMap):
         if j not in self.link_nodes[i]:
             self._set_link_nodes_and_costs(i, j, cost)    # set nodes and costs
         else:
-            index_ij = np.where(j == self.link_nodes[i])[0][0]
-            if cost < self.link_costs[i][index_ij]:
-                self.link_costs[i][index_ij] = cost    # update cost
+            idx_ij = np.where(j == self.link_nodes[i])[0][0]
+            if cost < self.link_costs[i][idx_ij]:
+                self.link_costs[i][idx_ij] = cost    # update cost
                 self.link_costs[j][np.where(i == self.link_nodes[j])[0][0]] = cost
 
-    def _search_links_recursively(self, node_indexes: list[int], cost: np.float32) -> None:
-        i = node_indexes[0]     # root
-        j = node_indexes[-1]    # leaf
+    def _search_links_recursively(self, node_idxes: list[int], cost: np.float32) -> None:
+        i = node_idxes[0]     # root
+        j = node_idxes[-1]    # leaf
 
-        for index_jk, k in enumerate(self.link_nodes[j]):
-            if k in node_indexes:
+        for idx_jk, k in enumerate(self.link_nodes[j]):
+            if k in node_idxes:
                 continue
 
-            cost_sum = cost + self.link_costs[j][index_jk]
+            cost_sum = cost + self.link_costs[j][idx_jk]
             if cost_sum <= param.MAX_LINK_LEN:
                 self._update_link_nodes_and_costs(i, k, cost_sum)
-                node_indexes.append(k)
-                self._search_links_recursively(node_indexes, cost_sum)
+                node_idxes.append(k)
+                self._search_links_recursively(node_idxes, cost_sum)
 
     def _search_indirect_links(self) -> None:
         for i in range(len(self.node_poses)):
@@ -103,12 +103,12 @@ class Map(PfMap):
 
     def _check_link_costs(self) -> None:
         for i in range(len(self.link_nodes)):
-            del_indexes = []
-            for index_ij, c in enumerate(self.link_costs[i]):
+            del_idxes = []
+            for idx_ij, c in enumerate(self.link_costs[i]):
                 if c > param.MAX_LINK_LEN:
-                    del_indexes.append(index_ij)
-            self.link_nodes[i] = np.delete(self.link_nodes[i], del_indexes)
-            self.link_costs[i] = np.delete(self.link_costs[i], del_indexes)
+                    del_idxes.append(idx_ij)
+            self.link_nodes[i] = np.delete(self.link_nodes[i], del_idxes)
+            self.link_costs[i] = np.delete(self.link_costs[i], del_idxes)
 
     # prepare lookup table of links
     def _set_links(self) -> None:
@@ -154,14 +154,14 @@ class Map(PfMap):
 
     def get_nearest_node(self, pos: np.ndarray) -> int:
         min_dist = np.inf
-        min_index = -1
+        min_idx = -1
         for i, p in enumerate(self.node_poses):
             dist = pf_util.calc_dist_by_pos(p, pos)
             if dist < min_dist:
                 min_dist = dist
-                min_index = i
+                min_idx = i
 
-        return min_index
+        return min_idx
 
     def draw_particles(self, last_pos: np.ndarray, particles: np.ndarray) -> None:
         super().draw_particles(particles)
@@ -176,8 +176,8 @@ class Map(PfMap):
         with open(path.join(param.ROOT_DIR, "map/link.csv"), mode="w", newline="") as f:
             writer = csv.writer(f)
             for i, js in enumerate(self.link_nodes):
-                for index_ij, j in enumerate(js):
-                    writer.writerow((self.node_names[i], self.node_names[j], self.link_costs[i][index_ij]))
+                for idx_ij, j in enumerate(js):
+                    writer.writerow((self.node_names[i], self.node_names[j], self.link_costs[i][idx_ij]))
 
         print("map.py: links have been exported to link.csv")
 
