@@ -1,4 +1,6 @@
+ipykernel
 matplotlib
+numba
 numpy
 opencv-python
 PyYAML
