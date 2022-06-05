@@ -3,7 +3,7 @@ from script.map import Map
 
 
 def prepare_links(enable_csv: bool = False, enable_pkl: bool = False, enable_show: bool = True) -> None:
-    map = Map(np.empty(0, dtype=str))
+    map = Map(np.empty(0, dtype="<U17"))
 
     if enable_csv:
         map.export_links_to_csv()
