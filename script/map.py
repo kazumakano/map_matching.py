@@ -1,3 +1,4 @@
+from calendar import c
 import csv
 import os.path as path
 import pickle
@@ -141,13 +142,15 @@ class Map(PfMap):
         if not param.ENABLE_DRAW_NODES:
             raise Warning("map.py: drawing nodes is not enabled but draw_nodes() was called")
 
-        for i, p in enumerate(self.node_poses):
-            if param.NODES_SHOW_POLICY == 1:      # circle
-                self._safe_draw_pos((128, 128, 128), is_never_cleared, p)
-            elif param.NODES_SHOW_POLICY == 2:    # node name
-                if is_never_cleared:
-                    cv2.putText(self.plain_img, self.node_names[i], p, cv2.FONT_HERSHEY_PLAIN, 0.5, (128, 128, 128), lineType=cv2.LINE_AA)
-                cv2.putText(self.img, self.node_names[i], p, cv2.FONT_HERSHEY_PLAIN, 0.5, (128, 128, 128), lineType=cv2.LINE_AA)
+        match param.NODES_SHOW_POLICY:
+            case 1:    # circle
+                for i, p in enumerate(self.node_poses):
+                    self._safe_draw_pos((128, 128, 128), is_never_cleared, p)
+            case 2:    # node name
+                for i, p in enumerate(self.node_poses):
+                    if is_never_cleared:
+                        cv2.putText(self.plain_img, self.node_names[i], p, cv2.FONT_HERSHEY_PLAIN, 0.5, (128, 128, 128), lineType=cv2.LINE_AA)
+                    cv2.putText(self.img, self.node_names[i], p, cv2.FONT_HERSHEY_PLAIN, 0.5, (128, 128, 128), lineType=cv2.LINE_AA)
 
     def get_nearest_node(self, pos: np.ndarray) -> int:
         min_dist = np.inf
